@@ -8,6 +8,21 @@ import java.util.List;
 /**
  * Builds a Delaunay triangulation of a set of points using the
  * Bowyer-Watson incremental algorithm.
+ * <p>
+ * The algorithm is intentionally written in a step by step, academic
+ * style so that every member of the team can explain it during the
+ * oral examination. The idea is the following:
+ * <ol>
+ *   <li>Start with one huge "super triangle" that contains every
+ *       input point.</li>
+ *   <li>Insert the points one by one. For each new point, find all the
+ *       triangles whose circumscribed circle contains it. These
+ *       triangles are "bad" and form a polygonal hole.</li>
+ *   <li>Remove the bad triangles, then fill the hole by joining the
+ *       new point to every edge of the boundary of that hole.</li>
+ *   <li>At the end, drop every triangle still connected to the super
+ *       triangle.</li>
+ * </ol>
  *
  * @author CharityMap team
  */
@@ -63,8 +78,38 @@ public class DelaunayTriangulator {
             return triangulation;
         }
 
-        // TODO: Implement super-triangle and Bowyer-Watson incremental loop
-        
+        // Step 1: build a super triangle large enough to wrap every
+        // point. We look at the bounding box of the points then push
+        // its corners far away.
+        double minX = Double.MAX_VALUE;
+        double minY = Double.MAX_VALUE;
+        double maxX = -Double.MAX_VALUE;
+        double maxY = -Double.MAX_VALUE;
+        for (Point p : points) {
+            minX = Math.min(minX, p.getX());
+            minY = Math.min(minY, p.getY());
+            maxX = Math.max(maxX, p.getX());
+            maxY = Math.max(maxY, p.getY());
+        }
+        double deltaX = maxX - minX;
+        double deltaY = maxY - minY;
+        double deltaMax = Math.max(deltaX, deltaY);
+        // Guard against the case where every point is identical.
+        if (deltaMax == 0.0) {
+            deltaMax = 1.0;
+        }
+        double midX = (minX + maxX) / 2.0;
+        double midY = (minY + maxY) / 2.0;
+
+        Point superA = new Point(midX - 20 * deltaMax, midY - deltaMax);
+        Point superB = new Point(midX, midY + 20 * deltaMax);
+        Point superC = new Point(midX + 20 * deltaMax, midY - deltaMax);
+
+        triangulation.add(new Triangle(superA, superB, superC));
+
+        // TODO: Insert each point one by one (Step 2)
+        // TODO: Drop triangles touching the super triangle (Step 3)
+
         return triangulation;
     }
 }
