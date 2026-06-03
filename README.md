@@ -12,11 +12,6 @@ javac -d out $(find src -name "*.java")
 java -cp out com.cergy.charitymap.cli.CommandLineApp
 ```
 
-Le jour de la soutenance, le barème impose de récupérer le dépôt Git,
-de compiler en ligne de commande, et de lancer le projet — sans passer
-par un environnement de développement. Les deux commandes ci-dessus
-suffisent. Entraînez-vous à les taper.
-
 ## Organisation des packages (architecture en couches)
 
 - `model`     : entités métier pures, AUCUN import JavaFX.
