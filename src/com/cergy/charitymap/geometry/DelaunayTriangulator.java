@@ -107,9 +107,73 @@ public class DelaunayTriangulator {
 
         triangulation.add(new Triangle(superA, superB, superC));
 
-        // TODO: Insert each point one by one (Step 2)
-        // TODO: Drop triangles touching the super triangle (Step 3)
+        // Step 2: insert each point one by one.
+        for (Point point : points) {
+            List<Triangle> badTriangles = new ArrayList<>();
 
-        return triangulation;
+            // Find every triangle whose circumscribed circle contains
+            // the new point.
+            for (Triangle triangle : triangulation) {
+                if (triangle.circumcircleContains(point)) {
+                    badTriangles.add(triangle);
+                }
+            }
+
+            // Build the boundary of the polygonal hole. An edge belongs
+            // to the boundary when it is shared by exactly one bad
+            // triangle.
+            List<Edge> boundary = new ArrayList<>();
+            for (Triangle triangle : badTriangles) {
+                Edge[] edges = {
+                        new Edge(triangle.getA(), triangle.getB()),
+                        new Edge(triangle.getB(), triangle.getC()),
+                        new Edge(triangle.getC(), triangle.getA())
+                };
+                for (Edge edge : edges) {
+                    boolean shared = false;
+                    for (Triangle other : badTriangles) {
+                        if (other == triangle) {
+                            continue;
+                        }
+                        Edge[] otherEdges = {
+                                new Edge(other.getA(), other.getB()),
+                                new Edge(other.getB(), other.getC()),
+                                new Edge(other.getC(), other.getA())
+                        };
+                        for (Edge otherEdge : otherEdges) {
+                            if (edge.sameAs(otherEdge)) {
+                                shared = true;
+                                break;
+                            }
+                        }
+                        if (shared) {
+                            break;
+                        }
+                    }
+                    if (!shared) {
+                        boundary.add(edge);
+                    }
+                }
+            }
+
+            // Remove the bad triangles from the triangulation.
+            triangulation.removeAll(badTriangles);
+
+            // Fill the hole: connect the new point to every boundary
+            // edge.
+            for (Edge edge : boundary) {
+                triangulation.add(new Triangle(edge.p1, edge.p2, point));
+            }
+        }
+
+        // Step 3: drop every triangle that still touches the super
+        // triangle, since those vertices are artificial.
+        List<Triangle> result = new ArrayList<>();
+        for (Triangle triangle : triangulation) {
+            if (!triangle.sharesVertexWith(superA, superB, superC)) {
+                result.add(triangle);
+            }
+        }
+        return result;
     }
 }
