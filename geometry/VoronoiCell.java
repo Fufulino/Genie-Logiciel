@@ -1,5 +1,9 @@
 package com.cergy.charitymap.geometry;
 
+import com.cergy.charitymap.model.Beneficiary;
+import com.cergy.charitymap.model.DistributionCenter;
+import com.cergy.charitymap.model.Point;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +20,7 @@ import java.util.List;
  * @author CharityMap team
  */
 public class VoronoiCell implements Serializable {
+
     /** Serialization version identifier. */
     private static final long serialVersionUID = 1L;
 
@@ -33,5 +38,58 @@ public class VoronoiCell implements Serializable {
     public VoronoiCell(DistributionCenter center) {
         this.center = center;
         this.corners = new ArrayList<>();
+    }
+
+    /**
+     * Returns the center this cell belongs to.
+     *
+     * @return the distribution center
+     */
+    public DistributionCenter getCenter() {
+        return center;
+    }
+
+    /**
+     * Returns the ordered corners of the cell polygon.
+     *
+     * @return the list of corners
+     */
+    public List<Point> getCorners() {
+        return new ArrayList<>(corners);
+    }
+
+    /**
+     * Adds a corner (a Voronoi vertex) to this cell. The corners are
+     * sorted afterwards by {@link #sortCorners()}.
+     *
+     * @param corner the corner to add
+     */
+    public void addCorner(Point corner) {
+        if (corner != null && !corners.contains(corner)) {
+            corners.add(corner);
+        }
+    }
+
+    /**
+     * Sorts the corners by their angle around the center so that the
+     * polygon is drawn without self intersection.
+     */
+    public void sortCorners() {
+        Point reference = center.getPosition();
+        corners.sort((p1, p2) -> {
+            double a1 = GeometryUtils.angleFromCenter(reference, p1);
+            double a2 = GeometryUtils.angleFromCenter(reference, p2);
+            return Double.compare(a1, a2);
+        });
+    }
+
+    /**
+     * Returns the surface of this coverage zone. An unbounded or not
+     * yet computed cell returns zero.
+     *
+     * @return the area of the cell
+     */
+    public double getArea() {
+        return GeometryUtils.polygonArea(corners);
     }
 }
