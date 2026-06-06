@@ -1,12 +1,15 @@
 package com.cergy.charitymap.cli;
 
 import com.cergy.charitymap.geometry.VoronoiCell;
-import com.cergy.charitymap.model.AidType;
 import com.cergy.charitymap.model.Association;
+import com.cergy.charitymap.model.AidType;
 import com.cergy.charitymap.model.Beneficiary;
 import com.cergy.charitymap.model.CharityMap;
 import com.cergy.charitymap.model.DistributionCenter;
+import com.cergy.charitymap.model.Distributor;
 import com.cergy.charitymap.model.Point;
+import com.cergy.charitymap.service.MapIO;
+import com.cergy.charitymap.service.RandomGenerator;
 
 import java.util.List;
 import java.util.Scanner;
@@ -44,7 +47,31 @@ public class CommandLineApp {
      */
     public static void main(String[] args) {
         CommandLineApp app = new CommandLineApp();
+        app.loadDemoData();
         app.run();
+    }
+
+    /**
+     * Fills the map with a small demonstration dataset so the user can
+     * see something meaningful immediately.
+     */
+    private void loadDemoData() {
+        Association restos = new Association("Restos du Coeur", AidType.FOOD);
+        Association croix = new Association("Croix Rouge", AidType.CARE);
+        Association vestiaire =
+                new Association("Vestiaire Solidaire", AidType.CLOTHING);
+
+        map.addCenter(new DistributionCenter(new Point(200, 300), restos));
+        map.addCenter(new DistributionCenter(new Point(600, 250), restos));
+        map.addCenter(new DistributionCenter(new Point(400, 600), croix));
+        map.addCenter(new DistributionCenter(new Point(750, 700), croix));
+        map.addCenter(new DistributionCenter(
+                new Point(300, 500), vestiaire));
+
+        RandomGenerator generator = new RandomGenerator(1000, 1000);
+        generator.addRandomBeneficiaries(map, 40);
+        generator.addRandomDistributors(map, 12);
+        map.recompute();
     }
 
     /**
@@ -80,7 +107,10 @@ public class CommandLineApp {
         System.out.println("2. List beneficiaries");
         System.out.println("3. Show statistics per coverage zone");
         System.out.println("4. Add a center");
-        System.out.println("5. Add a beneficiary");
+        System.out.println("5. Add random beneficiaries");
+        System.out.println("6. Move a center");
+        System.out.println("7. Save the map to a binary file");
+        System.out.println("8. Load a map from a binary file");
         System.out.println("0. Quit");
         System.out.print("Your choice: ");
     }
@@ -106,7 +136,16 @@ public class CommandLineApp {
                 addCenterInteractive();
                 return true;
             case "5":
-                addBeneficiaryInteractive();
+                addRandomBeneficiariesInteractive();
+                return true;
+            case "6":
+                moveCenterInteractive();
+                return true;
+            case "7":
+                saveInteractive();
+                return true;
+            case "8":
+                loadInteractive();
                 return true;
             case "0":
                 return false;
@@ -179,14 +218,71 @@ public class CommandLineApp {
     }
 
     /**
-     * Asks the user for the data needed to add a new beneficiary.
+     * Asks the user how many random beneficiaries to add.
      */
-    private void addBeneficiaryInteractive() {
-        AidType need = askAidType();
-        double x = askDouble("X position: ");
-        double y = askDouble("Y position: ");
-        map.addBeneficiary(new Beneficiary(new Point(x, y), need));
-        System.out.println("Beneficiary added and linked to closest center.");
+    private void addRandomBeneficiariesInteractive() {
+        int count = (int) askDouble("How many beneficiaries: ");
+        if (count <= 0) {
+            System.out.println("The number must be positive.");
+            return;
+        }
+        new RandomGenerator(1000, 1000)
+                .addRandomBeneficiaries(map, count);
+        System.out.println(count + " beneficiaries added.");
+    }
+
+    /**
+     * Asks the user which center to move and where.
+     */
+    private void moveCenterInteractive() {
+        listCenters();
+        int id = (int) askDouble("Id of the center to move: ");
+        DistributionCenter target = null;
+        for (DistributionCenter c : map.getCenters()) {
+            if (c.getId() == id) {
+                target = c;
+                break;
+            }
+        }
+        if (target == null) {
+            System.out.println("No center has this id.");
+            return;
+        }
+        double x = askDouble("New X position: ");
+        double y = askDouble("New Y position: ");
+        map.moveCenter(target, new Point(x, y));
+        System.out.println("Center moved and map recomputed.");
+    }
+
+    /**
+     * Asks the user for a file path then saves the map.
+     */
+    private void saveInteractive() {
+        System.out.print("File path to save to: ");
+        String path = scanner.nextLine().trim();
+        try {
+            new MapIO().save(map, path);
+            System.out.println("Map saved.");
+        } catch (Exception e) {
+            System.out.println("Could not save: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Asks the user for a file path then loads a map from it.
+     */
+    private void loadInteractive() {
+        System.out.print("File path to load from: ");
+        String path = scanner.nextLine().trim();
+        try {
+            CharityMap loaded = new MapIO().load(path);
+            System.out.println("Map loaded with "
+                    + loaded.getCenters().size() + " centers and "
+                    + loaded.getBeneficiaries().size()
+                    + " beneficiaries.");
+        } catch (Exception e) {
+            System.out.println("Could not load: " + e.getMessage());
+        }
     }
 
     /**

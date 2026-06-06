@@ -85,6 +85,18 @@ public class CharityMap implements Serializable {
     }
 
     /**
+     * Moves a center to a new position and recomputes the map. This is
+     * the dynamic update required by the specification.
+     *
+     * @param center      the center to move
+     * @param newPosition its new position
+     */
+    public void moveCenter(DistributionCenter center, Point newPosition) {
+        center.setPosition(newPosition);
+        recompute();
+    }
+
+    /**
      * Removes a distribution center and recomputes the map.
      *
      * @param center the center to remove
@@ -242,6 +254,20 @@ public class CharityMap implements Serializable {
         }
         List<VoronoiCell> cells = cellsByType.get(type);
         return (cells == null) ? new ArrayList<>() : cells;
+    }
+
+    /**
+     * Returns the Delaunay triangulation of a given aid type.
+     *
+     * @param type the aid type
+     * @return the triangulation, never null
+     */
+    public List<Triangle> getTriangles(AidType type) {
+        if (trianglesByType == null) {
+            return new ArrayList<>();
+        }
+        List<Triangle> triangles = trianglesByType.get(type);
+        return (triangles == null) ? new ArrayList<>() : triangles;
     }
 
     /**
