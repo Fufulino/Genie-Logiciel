@@ -92,5 +92,93 @@ public class VoronoiCell implements Serializable {
     public double getArea() {
         return GeometryUtils.polygonArea(corners);
     }
+
+    
+    /**
+     * Returns the number of beneficiaries linked to this center.
+     *
+     * @return the number of covered beneficiaries
+     */
+    public int getBeneficiaryCount() {
+        return center.getLinkedBeneficiaries().size();
+    }
+
+    /**
+     * Returns the average distance a beneficiary of this zone has to
+     * travel to reach the center. This is a strong territorial equity
+     * indicator for the ethics scope.
+     *
+     * @return the average travel distance, or zero when no beneficiary
+     */
+    public double getAverageTravelDistance() {
+        List<Beneficiary> people = center.getLinkedBeneficiaries();
+        if (people.isEmpty()) {
+            return 0.0;
+        }
+        double total = 0.0;
+        for (Beneficiary b : people) {
+            total += b.getPosition().distanceTo(center.getPosition());
+        }
+        return total / people.size();
+    }
+
+    /**
+     * Returns the maximum distance any beneficiary of this zone has to
+     * travel. A large value points at someone left behind.
+     *
+     * @return the maximum travel distance, or zero when no beneficiary
+     */
+    public double getMaxTravelDistance() {
+        double max = 0.0;
+        for (Beneficiary b : center.getLinkedBeneficiaries()) {
+            double d = b.getPosition().distanceTo(center.getPosition());
+            if (d > max) {
+                max = d;
+            }
+        }
+        return max;
+    }
+
+    /**
+     * Returns the load of the center: number of beneficiaries per
+     * distributor. A high value means the team on the ground is
+     * overwhelmed.
+     *
+     * @return the load, or the beneficiary count when there is no
+     *         distributor at all
+     */
+    public double getLoadPerDistributor() {
+        int distributors = center.getDistributors().size();
+        int beneficiaries = getBeneficiaryCount();
+        if (distributors == 0) {
+            return beneficiaries;
+        }
+        return (double) beneficiaries / distributors;
+    }
+
+    /**
+     * Builds a multi line report of the statistics of this zone, ready
+     * to be printed by the command line interface.
+     *
+     * @return a human readable statistics report
+     */
+    public String statisticsReport() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Coverage zone of ").append(center).append("\n");
+        sb.append("  Beneficiaries covered : ")
+                .append(getBeneficiaryCount()).append("\n");
+        sb.append("  Average travel distance: ")
+                .append(String.format("%.2f", getAverageTravelDistance()))
+                .append("\n");
+        sb.append("  Maximum travel distance: ")
+                .append(String.format("%.2f", getMaxTravelDistance()))
+                .append("\n");
+        sb.append("  Load per distributor   : ")
+                .append(String.format("%.2f", getLoadPerDistributor()))
+                .append("\n");
+        sb.append("  Zone area              : ")
+                .append(String.format("%.2f", getArea()));
+        return sb.toString();
+    }
 }
 
