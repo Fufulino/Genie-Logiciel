@@ -1,7 +1,7 @@
-package com.cergy.charitymap.geometry;
+package com.charitymap.geometry;
 
-import com.cergy.charitymap.model.DistributionCenter;
-import com.cergy.charitymap.model.Point;
+import com.charitymap.model.DistributionCenter;
+import com.charitymap.model.Point;
 
 import java.util.ArrayList;
 import java.util.List;
