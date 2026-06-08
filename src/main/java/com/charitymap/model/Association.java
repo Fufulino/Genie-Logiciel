@@ -1,4 +1,4 @@
-package com.cergy.charitymap.model;
+package com.charitymap.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -109,3 +109,4 @@ public class Association implements Serializable {
         return name + " [" + aidType.getLabel() + "]";
     }
 }
+

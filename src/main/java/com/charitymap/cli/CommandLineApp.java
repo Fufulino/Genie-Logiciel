@@ -1,12 +1,12 @@
-package com.cergy.charitymap.cli;
+package com.charitymap.cli;
 
-import com.cergy.charitymap.geometry.VoronoiCell;
-import com.cergy.charitymap.model.AidType;
-import com.cergy.charitymap.model.Association;
-import com.cergy.charitymap.model.Beneficiary;
-import com.cergy.charitymap.model.CharityMap;
-import com.cergy.charitymap.model.DistributionCenter;
-import com.cergy.charitymap.model.Point;
+import com.charitymap.geometry.VoronoiCell;
+import com.charitymap.model.AidType;
+import com.charitymap.model.Association;
+import com.charitymap.model.Beneficiary;
+import com.charitymap.model.CharityMap;
+import com.charitymap.model.DistributionCenter;
+import com.charitymap.model.Point;
 
 import java.util.List;
 import java.util.Scanner;
@@ -230,3 +230,4 @@ public class CommandLineApp {
         }
     }
 }
+

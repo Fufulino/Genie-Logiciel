@@ -1,4 +1,4 @@
-package com.cergy.charitymap.model;
+package com.charitymap.model;
 
 import java.io.Serializable;
 
@@ -113,3 +113,4 @@ public class Distributor implements Serializable {
                 + " from center #" + homeCenter.getId();
     }
 }
+

@@ -1,4 +1,4 @@
-package com.cergy.charitymap.model;
+package com.charitymap.model;
 
 /**
  * The kind of help a charity association provides in the city of Cergy.
@@ -42,3 +42,4 @@ public enum AidType {
         return label;
     }
 }
+

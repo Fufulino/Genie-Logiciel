@@ -1,4 +1,4 @@
-package com.cergy.charitymap.model;
+package com.charitymap.model;
 
 import java.io.Serializable;
 
@@ -127,3 +127,4 @@ public final class Point implements Serializable {
         return String.format("(%.2f, %.2f)", x, y);
     }
 }
+

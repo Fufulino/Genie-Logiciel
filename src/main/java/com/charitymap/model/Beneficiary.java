@@ -1,4 +1,4 @@
-package com.cergy.charitymap.model;
+package com.charitymap.model;
 
 import java.io.Serializable;
 
@@ -135,3 +135,4 @@ public class Beneficiary implements Serializable {
                 + " needs " + need.getLabel() + ", linked to " + target;
     }
 }
+

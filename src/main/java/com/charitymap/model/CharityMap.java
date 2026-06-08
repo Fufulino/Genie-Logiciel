@@ -1,9 +1,9 @@
-package com.cergy.charitymap.model;
+package com.charitymap.model;
 
-import com.cergy.charitymap.geometry.DelaunayTriangulator;
-import com.cergy.charitymap.geometry.Triangle;
-import com.cergy.charitymap.geometry.VoronoiBuilder;
-import com.cergy.charitymap.geometry.VoronoiCell;
+import com.charitymap.geometry.DelaunayTriangulator;
+import com.charitymap.geometry.Triangle;
+import com.charitymap.geometry.VoronoiBuilder;
+import com.charitymap.geometry.VoronoiCell;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -280,3 +280,4 @@ public class CharityMap implements Serializable {
         return new ArrayList<>(distributors);
     }
 }
+

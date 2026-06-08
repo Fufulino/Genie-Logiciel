@@ -1,6 +1,6 @@
-package com.cergy.charitymap.geometry;
+package com.charitymap.geometry;
 
-import com.cergy.charitymap.model.Point;
+import com.charitymap.model.Point;
 
 import java.io.Serializable;
 
@@ -138,3 +138,4 @@ public class Triangle implements Serializable {
         return "Triangle[" + a + ", " + b + ", " + c + "]";
     }
 }
+
