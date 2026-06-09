@@ -31,8 +31,7 @@ public class DistributionCenter implements Serializable {
     /** The association this center belongs to. */
     private final Association association;
 
-    /** The mobile distributors working from this center. */
-    private final List<Distributor> distributors;
+
 
     /** The beneficiaries currently linked to this center. */
     private final List<Beneficiary> linkedBeneficiaries;
@@ -52,7 +51,7 @@ public class DistributionCenter implements Serializable {
         this.id = nextId++;
         this.position = position;
         this.association = association;
-        this.distributors = new ArrayList<>();
+
         this.linkedBeneficiaries = new ArrayList<>();
         association.addCenter(this);
     }
@@ -106,34 +105,7 @@ public class DistributionCenter implements Serializable {
         return association.getAidType();
     }
 
-    /**
-     * Returns a copy of the distributors working from this center.
-     *
-     * @return the list of distributors
-     */
-    public List<Distributor> getDistributors() {
-        return new ArrayList<>(distributors);
-    }
 
-    /**
-     * Adds a distributor to this center.
-     *
-     * @param distributor the distributor to add
-     */
-    public void addDistributor(Distributor distributor) {
-        if (distributor != null && !distributors.contains(distributor)) {
-            distributors.add(distributor);
-        }
-    }
-
-    /**
-     * Removes a distributor from this center.
-     *
-     * @param distributor the distributor to remove
-     */
-    public void removeDistributor(Distributor distributor) {
-        distributors.remove(distributor);
-    }
 
     /**
      * Returns a copy of the beneficiaries linked to this center.
