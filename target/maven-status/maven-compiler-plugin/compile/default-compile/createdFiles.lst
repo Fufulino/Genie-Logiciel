@@ -1,0 +1,16 @@
+com\charitymap\geometry\VoronoiCell.class
+com\charitymap\model\CharityMap.class
+com\charitymap\service\MapIO.class
+com\charitymap\geometry\GeometryUtils.class
+com\charitymap\service\RandomGenerator.class
+com\charitymap\cli\CommandLineApp.class
+com\charitymap\geometry\DelaunayTriangulator.class
+com\charitymap\model\Beneficiary.class
+com\charitymap\model\Distributor.class
+com\charitymap\geometry\Triangle.class
+com\charitymap\model\DistributionCenter.class
+com\charitymap\model\Association.class
+com\charitymap\geometry\DelaunayTriangulator$Edge.class
+com\charitymap\model\Point.class
+com\charitymap\geometry\VoronoiBuilder.class
+com\charitymap\model\AidType.class
