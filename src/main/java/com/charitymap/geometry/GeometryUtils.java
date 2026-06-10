@@ -1,6 +1,6 @@
-package com.cergy.charitymap.geometry;
+package com.charitymap.geometry;
 
-import com.cergy.charitymap.model.Point;
+import com.charitymap.model.Point;
 
 import java.util.List;
 
@@ -119,3 +119,4 @@ public final class GeometryUtils {
                 p.getX() - center.getX());
     }
 }
+
