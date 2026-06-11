@@ -36,9 +36,6 @@ public class CharityMap implements Serializable {
     /** Every beneficiary on the map. */
     private final List<Beneficiary> beneficiaries;
 
-    /** Every distributor on the map. */
-    private final List<Distributor> distributors;
-
     /** The current Delaunay triangulation per aid type. */
     private transient Map<AidType, List<Triangle>> trianglesByType;
 
@@ -52,7 +49,6 @@ public class CharityMap implements Serializable {
         this.associations = new ArrayList<>();
         this.centers = new ArrayList<>();
         this.beneficiaries = new ArrayList<>();
-        this.distributors = new ArrayList<>();
         this.trianglesByType = new EnumMap<>(AidType.class);
         this.cellsByType = new EnumMap<>(AidType.class);
     }
@@ -116,28 +112,6 @@ public class CharityMap implements Serializable {
     public void removeBeneficiary(Beneficiary beneficiary) {
         if (beneficiaries.remove(beneficiary)) {
             assignBeneficiaries();
-        }
-    }
-
-    /**
-     * Registers a distributor on the map.
-     *
-     * @param distributor the distributor to add
-     */
-    public void addDistributor(Distributor distributor) {
-        if (distributor != null && !distributors.contains(distributor)) {
-            distributors.add(distributor);
-        }
-    }
-
-    /**
-     * Removes a distributor from the map.
-     *
-     * @param distributor the distributor to remove
-     */
-    public void removeDistributor(Distributor distributor) {
-        if (distributors.remove(distributor)) {
-            distributor.getHomeCenter().removeDistributor(distributor);
         }
     }
 
@@ -245,6 +219,19 @@ public class CharityMap implements Serializable {
     }
 
     /**
+     * Returns all currently computed Voronoi cells for every aid type.
+     *
+     * @return all cells, never null
+     */
+    public List<VoronoiCell> getAllCells() {
+        List<VoronoiCell> allCells = new ArrayList<>();
+        for (AidType type : AidType.values()) {
+            allCells.addAll(getCells(type));
+        }
+        return allCells;
+    }
+
+    /**
      * Returns every association.
      *
      * @return a copy of the associations list
@@ -269,15 +256,6 @@ public class CharityMap implements Serializable {
      */
     public List<Beneficiary> getBeneficiaries() {
         return new ArrayList<>(beneficiaries);
-    }
-
-    /**
-     * Returns every distributor.
-     *
-     * @return a copy of the distributors list
-     */
-    public List<Distributor> getDistributors() {
-        return new ArrayList<>(distributors);
     }
 }
 
