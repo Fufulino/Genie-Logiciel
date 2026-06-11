@@ -57,6 +57,61 @@ public class DetailsPanel extends VBox {
     }
 
     /**
+     * Displays details of a selected distribution center.
+     *
+     * @param center the selected distribution center
+     * @param map    the global map container
+     */
+    public void showCenterDetails(DistributionCenter center, CharityMap map) {
+        titleLabel.setText("Centre #" + center.getId());
+        String info = "Association: " + center.getAssociation().getName() + "\n"
+                    + "Aide: " + center.getAidType() + "\n"
+                    + "GPS: " + GeoProjection.formatGps(center.getPosition().getX(), center.getPosition().getY()) + "\n"
+                    + "Bénéficiaires affectés: " + center.getLinkedBeneficiaries().size() + "\n";
+
+        VoronoiCell cell = null;
+        for (VoronoiCell c : map.getAllCells()) {
+            if (c.getCenter() == center) {
+                cell = c;
+                break;
+            }
+        }
+
+        if (cell != null) {
+            double areaM2 = cell.getArea() * 32.49;
+            String areaStr = areaM2 >= 1_000_000 
+                ? String.format("%.2f km²", areaM2 / 1_000_000.0) 
+                : String.format("%.1f ha", areaM2 / 10000.0);
+                
+            info += "\n[Statistiques Voronoi]\n"
+                  + "Couverture: " + areaStr + "\n"
+                  + "Dist. moyenne: " + GeoProjection.formatDistance(cell.getAverageTravelDistance()) + "\n"
+                  + "Dist. max: " + GeoProjection.formatDistance(cell.getMaxTravelDistance());
+        }
+        detailsLabel.setText(info);
+    }
+
+    /**
+     * Displays details of a selected beneficiary.
+     *
+     * @param b the selected beneficiary
+     */
+    public void showBeneficiaryDetails(Beneficiary b) {
+        titleLabel.setText("Bénéficiaire #" + b.getId());
+        String info = "Besoin: " + b.getNeed() + "\n"
+                    + "GPS: " + GeoProjection.formatGps(b.getPosition().getX(), b.getPosition().getY()) + "\n";
+        
+        if (b.getAssignedCenter() != null) {
+            info += "\nCentre assigné:\n"
+                  + b.getAssignedCenter().getAssociation().getName() + " #" + b.getAssignedCenter().getId() + "\n"
+                  + "Distance: " + GeoProjection.formatDistance(b.distanceToAssignedCenter());
+        } else {
+            info += "\nCentre assigné: Aucun";
+        }
+        detailsLabel.setText(info);
+    }
+
+    /**
      * Displays analysis details of a selected Delaunay triangle.
      *
      * @param t   the selected Delaunay triangle
