@@ -1,0 +1,178 @@
+package com.charitymap.gui;
+
+import com.charitymap.geometry.GeometryUtils;
+import com.charitymap.geometry.Triangle;
+import com.charitymap.geometry.VoronoiCell;
+import com.charitymap.model.Beneficiary;
+import com.charitymap.model.CharityMap;
+import com.charitymap.model.DistributionCenter;
+
+import javafx.geometry.Insets;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.layout.VBox;
+
+import java.util.List;
+
+/**
+ * Right-side details display panel.
+ */
+public class DetailsPanel extends VBox {
+
+    private final Label titleLabel;
+    private final Label detailsLabel;
+    private final Label statsLabel;
+
+    /**
+     * Creates a new DetailsPanel with labels and borders.
+     */
+    public DetailsPanel() {
+        setPrefWidth(260);
+        setMinWidth(260);
+        setMaxWidth(260);
+        setSpacing(10);
+        setPadding(new Insets(15));
+        setStyle("-fx-background-color: #f8fafc; -fx-border-color: #cbd5e1; -fx-border-width: 0 0 0 1px;");
+
+        titleLabel = new Label("Propriétés");
+        titleLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+
+        detailsLabel = new Label();
+        detailsLabel.setWrapText(true);
+        detailsLabel.setStyle("-fx-font-size: 12px;");
+
+        statsLabel = new Label();
+        statsLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #475569;");
+
+        getChildren().addAll(titleLabel, new Separator(), detailsLabel, new Separator(), statsLabel);
+        clearDetails();
+    }
+
+    /**
+     * Resets details to a default placeholder message.
+     */
+    public void clearDetails() {
+        titleLabel.setText("Détails");
+        detailsLabel.setText("Cliquez sur un élément de la carte.");
+    }
+
+    /**
+     * Displays details of a selected distribution center.
+     *
+     * @param center the selected distribution center
+     * @param map    the global map container
+     */
+    public void showCenterDetails(DistributionCenter center, CharityMap map) {
+        titleLabel.setText("Centre #" + center.getId());
+        String info = "Association: " + center.getAssociation().getName() + "\n"
+                    + "Aide: " + center.getAidType() + "\n"
+                    + "GPS: " + GeoProjection.formatGps(center.getPosition().getX(), center.getPosition().getY()) + "\n"
+                    + "Bénéficiaires affectés: " + center.getLinkedBeneficiaries().size() + "\n";
+
+        VoronoiCell cell = null;
+        for (VoronoiCell c : map.getAllCells()) {
+            if (c.getCenter() == center) {
+                cell = c;
+                break;
+            }
+        }
+
+        if (cell != null) {
+            double areaM2 = cell.getArea() * 32.49;
+            String areaStr = areaM2 >= 1_000_000 
+                ? String.format("%.2f km²", areaM2 / 1_000_000.0) 
+                : String.format("%.1f ha", areaM2 / 10000.0);
+                
+            info += "\n[Statistiques Voronoi]\n"
+                  + "Couverture: " + areaStr + "\n"
+                  + "Dist. moyenne: " + GeoProjection.formatDistance(cell.getAverageTravelDistance()) + "\n"
+                  + "Dist. max: " + GeoProjection.formatDistance(cell.getMaxTravelDistance());
+        }
+        detailsLabel.setText(info);
+    }
+
+    /**
+     * Displays details of a selected beneficiary.
+     *
+     * @param b the selected beneficiary
+     */
+    public void showBeneficiaryDetails(Beneficiary b) {
+        titleLabel.setText("Bénéficiaire #" + b.getId());
+        String info = "Besoin: " + b.getNeed() + "\n"
+                    + "GPS: " + GeoProjection.formatGps(b.getPosition().getX(), b.getPosition().getY()) + "\n";
+        
+        if (b.getAssignedCenter() != null) {
+            info += "\nCentre assigné:\n"
+                  + b.getAssignedCenter().getAssociation().getName() + " #" + b.getAssignedCenter().getId() + "\n"
+                  + "Distance: " + GeoProjection.formatDistance(b.distanceToAssignedCenter());
+        } else {
+            info += "\nCentre assigné: Aucun";
+        }
+        detailsLabel.setText(info);
+    }
+
+    /**
+     * Displays analysis details of a selected Delaunay triangle.
+     *
+     * @param t   the selected Delaunay triangle
+     * @param map the global map container
+     */
+    public void showTriangleDetails(Triangle t, CharityMap map) {
+        titleLabel.setText("Triangle Delaunay");
+        
+        DistributionCenter centerA = null, centerB = null, centerC = null;
+        for (DistributionCenter c : map.getCenters()) {
+            if (c.getPosition().distanceTo(t.getA()) < 0.01) centerA = c;
+            if (c.getPosition().distanceTo(t.getB()) < 0.01) centerB = c;
+            if (c.getPosition().distanceTo(t.getC()) < 0.01) centerC = c;
+        }
+        
+        int bA = (centerA != null) ? centerA.getLinkedBeneficiaries().size() : 0;
+        int bB = (centerB != null) ? centerB.getLinkedBeneficiaries().size() : 0;
+        int bC = (centerC != null) ? centerC.getLinkedBeneficiaries().size() : 0;
+        
+        int maxB = Math.max(bA, Math.max(bB, bC));
+        int minB = Math.min(bA, Math.min(bB, bC));
+        int diff = maxB - minB;
+        
+        double areaPixels = GeometryUtils.polygonArea(List.of(t.getA(), t.getB(), t.getC()));
+        double areaM2 = areaPixels * 32.49;
+        String areaStr = areaM2 >= 1_000_000 
+            ? String.format("%.2f km²", areaM2 / 1_000_000.0) 
+            : String.format("%.1f ha", areaM2 / 10000.0);
+            
+        double dAB = t.getA().distanceTo(t.getB()) * 5.7;
+        double dBC = t.getB().distanceTo(t.getC()) * 5.7;
+        double dCA = t.getC().distanceTo(t.getA()) * 5.7;
+        
+        String density = (areaPixels < 20000) ? "Zone Dense" : "Zone Désertique/Dispersée";
+        String recommendation = (areaPixels > 80000) 
+            ? "Déséquilibre : distances importantes. Suggère d'ajouter un nouveau centre près du centre circonscrit pour optimiser la couverture."
+            : "La couverture est optimale pour cette zone.";
+            
+        String info = "Sommets (Centres) :\n"
+                    + "- Centre A (ID " + (centerA != null ? centerA.getId() : "?") + ") : " + bA + " bénéficiaires\n"
+                    + "- Centre B (ID " + (centerB != null ? centerB.getId() : "?") + ") : " + bB + " bénéficiaires\n"
+                    + "- Centre C (ID " + (centerC != null ? centerC.getId() : "?") + ") : " + bC + " bénéficiaires\n\n"
+                    + "Déséquilibre (Max - Min) : " + diff + " bénéficiaires\n"
+                    + "Densité de zone : " + density + "\n"
+                    + "Surface : " + areaStr + "\n"
+                    + "Longueurs des côtés :\n"
+                    + "  A-B : " + String.format("%.0f m", dAB) + "\n"
+                    + "  B-C : " + String.format("%.0f m", dBC) + "\n"
+                    + "  C-A : " + String.format("%.0f m", dCA) + "\n\n"
+                    + "Recommandation :\n" + recommendation;
+                    
+        detailsLabel.setText(info);
+    }
+
+    /**
+     * Updates the global statistics label in the bottom of the panel.
+     *
+     * @param map the global map container
+     */
+    public void updateStatistics(CharityMap map) {
+        statsLabel.setText(String.format("Stats Globales:\n- %d Centres\n- %d Bénéficiaires",
+                map.getCenters().size(), map.getBeneficiaries().size()));
+    }
+}
