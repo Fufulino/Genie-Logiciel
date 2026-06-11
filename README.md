@@ -16,7 +16,7 @@ java -cp out com.cergy.charitymap.cli.CommandLineApp
 
 - `model`     : entités métier pures, AUCUN import JavaFX.
                 Point, AidType, Association, DistributionCenter,
-                Beneficiary, Distributor, CharityMap (le chef
+                Beneficiary, CharityMap (le chef
                 d'orchestre).
 - `geometry`  : les mathématiques. GeometryUtils, Triangle,
                 DelaunayTriangulator (Bowyer-Watson), VoronoiBuilder,

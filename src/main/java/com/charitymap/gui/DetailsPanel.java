@@ -13,6 +13,7 @@ import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Right-side details display panel.
@@ -48,6 +49,14 @@ public class DetailsPanel extends VBox {
         clearDetails();
     }
 
+    private static String formatGps(double x, double y) {
+        return String.format(Locale.US, "(%.5f, %.5f)", x, y);
+    }
+
+    private static String formatDistance(double distance) {
+        return String.format(Locale.US, "%.1f km", distance / 1000.0);
+    }
+
     /**
      * Resets details to a default placeholder message.
      */
@@ -66,7 +75,7 @@ public class DetailsPanel extends VBox {
         titleLabel.setText("Centre #" + center.getId());
         String info = "Association: " + center.getAssociation().getName() + "\n"
                     + "Aide: " + center.getAidType() + "\n"
-                    + "GPS: " + GeoProjection.formatGps(center.getPosition().getX(), center.getPosition().getY()) + "\n"
+                    + "GPS: " + formatGps(center.getPosition().getX(), center.getPosition().getY()) + "\n"
                     + "Bénéficiaires affectés: " + center.getLinkedBeneficiaries().size() + "\n";
 
         VoronoiCell cell = null;
@@ -85,8 +94,8 @@ public class DetailsPanel extends VBox {
                 
             info += "\n[Statistiques Voronoi]\n"
                   + "Couverture: " + areaStr + "\n"
-                  + "Dist. moyenne: " + GeoProjection.formatDistance(cell.getAverageTravelDistance()) + "\n"
-                  + "Dist. max: " + GeoProjection.formatDistance(cell.getMaxTravelDistance());
+                  + "Dist. moyenne: " + formatDistance(cell.getAverageTravelDistance()) + "\n"
+                  + "Dist. max: " + formatDistance(cell.getMaxTravelDistance());
         }
         detailsLabel.setText(info);
     }
@@ -99,12 +108,12 @@ public class DetailsPanel extends VBox {
     public void showBeneficiaryDetails(Beneficiary b) {
         titleLabel.setText("Bénéficiaire #" + b.getId());
         String info = "Besoin: " + b.getNeed() + "\n"
-                    + "GPS: " + GeoProjection.formatGps(b.getPosition().getX(), b.getPosition().getY()) + "\n";
+                    + "GPS: " + formatGps(b.getPosition().getX(), b.getPosition().getY()) + "\n";
         
         if (b.getAssignedCenter() != null) {
             info += "\nCentre assigné:\n"
                   + b.getAssignedCenter().getAssociation().getName() + " #" + b.getAssignedCenter().getId() + "\n"
-                  + "Distance: " + GeoProjection.formatDistance(b.distanceToAssignedCenter());
+                  + "Distance: " + formatDistance(b.distanceToAssignedCenter());
         } else {
             info += "\nCentre assigné: Aucun";
         }
