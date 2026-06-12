@@ -71,6 +71,18 @@ public class DelaunayTriangulator {
      * @return the list of triangles of the triangulation
      */
     public List<Triangle> triangulate(List<Point> points) {
+        return triangulate(points, false);
+    }
+
+    /**
+     * Computes the Delaunay triangulation of the given points, optionally keeping
+     * the triangles that share vertices with the super-triangle.
+     *
+     * @param points            the input points (sites). May be empty.
+     * @param keepSuperTriangle true to keep all triangles including those touching the super-triangle
+     * @return the list of triangles of the triangulation
+     */
+    public List<Triangle> triangulate(List<Point> points, boolean keepSuperTriangle) {
         List<Triangle> triangulation = new ArrayList<>();
 
         // Fewer than three points cannot form any triangle.
@@ -164,6 +176,10 @@ public class DelaunayTriangulator {
             for (Edge edge : boundary) {
                 triangulation.add(new Triangle(edge.p1, edge.p2, point));
             }
+        }
+
+        if (keepSuperTriangle) {
+            return triangulation;
         }
 
         // Step 3: drop every triangle that still touches the super

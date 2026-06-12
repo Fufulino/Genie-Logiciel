@@ -140,23 +140,6 @@ public class VoronoiCell implements Serializable {
     }
 
     /**
-     * Returns the load of the center: number of beneficiaries per
-     * distributor. A high value means the team on the ground is
-     * overwhelmed.
-     *
-     * @return the load, or the beneficiary count when there is no
-     *         distributor at all
-     */
-    public double getLoadPerDistributor() {
-        int distributors = center.getDistributors().size();
-        int beneficiaries = getBeneficiaryCount();
-        if (distributors == 0) {
-            return beneficiaries;
-        }
-        return (double) beneficiaries / distributors;
-    }
-
-    /**
      * Builds a multi line report of the statistics of this zone, ready
      * to be printed by the command line interface.
      *
@@ -173,12 +156,8 @@ public class VoronoiCell implements Serializable {
         sb.append("  Maximum travel distance: ")
                 .append(String.format("%.2f", getMaxTravelDistance()))
                 .append("\n");
-        sb.append("  Load per distributor   : ")
-                .append(String.format("%.2f", getLoadPerDistributor()))
-                .append("\n");
         sb.append("  Zone area              : ")
                 .append(String.format("%.2f", getArea()));
         return sb.toString();
     }
 }
-

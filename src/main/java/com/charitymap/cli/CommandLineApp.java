@@ -20,8 +20,8 @@ import java.util.Scanner;
  * <p>
  * This version adds the statistics view: once the geometry layer is
  * plugged in, each coverage zone exposes its social indicators
- * (covered beneficiaries, average travel distance, load per
- * distributor). Mass generation and persistence will follow.
+ * (covered beneficiaries, average travel distance, and local
+ * coverage balance). Mass generation and persistence will follow.
  *
  * @author CharityMap team
  */
