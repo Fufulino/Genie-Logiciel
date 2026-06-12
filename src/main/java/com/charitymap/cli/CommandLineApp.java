@@ -64,12 +64,7 @@ public class CommandLineApp {
         map.addCenter(new DistributionCenter(new Point(300, 500), vestiaire));
 
         RandomGenerator generator = new RandomGenerator(1000, 1000);
-        double marginLat = (com.charitymap.gui.GeoProjection.LAT_MAX - com.charitymap.gui.GeoProjection.LAT_MIN) * 0.02;
-        double marginLon = (com.charitymap.gui.GeoProjection.LON_MAX - com.charitymap.gui.GeoProjection.LON_MIN) * 0.02;
-        generator.addRandomBeneficiaries(map, 40,
-                com.charitymap.gui.GeoProjection.LON_MIN + marginLon, com.charitymap.gui.GeoProjection.LON_MAX - marginLon,
-                com.charitymap.gui.GeoProjection.LAT_MIN + marginLat, com.charitymap.gui.GeoProjection.LAT_MAX - marginLat,
-                com.charitymap.gui.GeoProjection::toPixel);
+        generator.addRandomBeneficiaries(map, 40);
 
         map.recompute();
     }
@@ -235,12 +230,7 @@ public class CommandLineApp {
             System.out.println("Le nombre doit être positif.");
             return;
         }
-        double marginLat = (com.charitymap.gui.GeoProjection.LAT_MAX - com.charitymap.gui.GeoProjection.LAT_MIN) * 0.02;
-        double marginLon = (com.charitymap.gui.GeoProjection.LON_MAX - com.charitymap.gui.GeoProjection.LON_MIN) * 0.02;
-        new RandomGenerator(1000, 1000).addRandomBeneficiaries(map, count,
-                com.charitymap.gui.GeoProjection.LON_MIN + marginLon, com.charitymap.gui.GeoProjection.LON_MAX - marginLon,
-                com.charitymap.gui.GeoProjection.LAT_MIN + marginLat, com.charitymap.gui.GeoProjection.LAT_MAX - marginLat,
-                com.charitymap.gui.GeoProjection::toPixel);
+        new RandomGenerator(1000, 1000).addRandomBeneficiaries(map, count);
         System.out.println(count + " bénéficiaires ajoutés.");
     }
 
