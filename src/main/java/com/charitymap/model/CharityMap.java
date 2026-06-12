@@ -49,10 +49,6 @@ public class CharityMap implements Serializable {
         this.associations = new ArrayList<>();
         this.centers = new ArrayList<>();
         this.beneficiaries = new ArrayList<>();
-<<<<<<< HEAD
-
-=======
->>>>>>> main
         this.trianglesByType = new EnumMap<>(AidType.class);
         this.cellsByType = new EnumMap<>(AidType.class);
     }
@@ -119,9 +115,6 @@ public class CharityMap implements Serializable {
         }
     }
 
-<<<<<<< HEAD
-
-
     /**
      * Clears all centers, beneficiaries, associations, and distributors.
      */
@@ -133,8 +126,6 @@ public class CharityMap implements Serializable {
         recompute();
     }
 
-=======
->>>>>>> main
     /**
      * Recomputes the whole map: one Delaunay triangulation and one
      * Voronoi diagram per aid type, then the beneficiary assignments.
@@ -274,7 +265,6 @@ public class CharityMap implements Serializable {
     }
 
     /**
-<<<<<<< HEAD
      * Returns the Delaunay triangulation of a given aid type.
      *
      * @param type the aid type
@@ -318,18 +308,6 @@ public class CharityMap implements Serializable {
             all.addAll(list);
         }
         return all;
-=======
-     * Returns all currently computed Voronoi cells for every aid type.
-     *
-     * @return all cells, never null
-     */
-    public List<VoronoiCell> getAllCells() {
-        List<VoronoiCell> allCells = new ArrayList<>();
-        for (AidType type : AidType.values()) {
-            allCells.addAll(getCells(type));
-        }
-        return allCells;
->>>>>>> main
     }
 
     /**
@@ -358,9 +336,4 @@ public class CharityMap implements Serializable {
     public List<Beneficiary> getBeneficiaries() {
         return new ArrayList<>(beneficiaries);
     }
-<<<<<<< HEAD
 }
-=======
-}
-
->>>>>>> main
