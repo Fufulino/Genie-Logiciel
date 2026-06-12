@@ -58,7 +58,7 @@ public class RandomGenerator {
      * @param projection a function used to convert the generated latitude/longitude
      *                   coordinates into a {@link Point} on the map
      */
-    public void addRandomBeneficiariesInBounds(CharityMap map, int count,
+    public void addRandomBeneficiaries(CharityMap map, int count,
             double minLng, double maxLng, double minLat, double maxLat,
             java.util.function.BiFunction<Double, Double, Point> projection) {
         AidType[] types = AidType.values();
