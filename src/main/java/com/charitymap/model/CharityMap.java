@@ -36,9 +36,6 @@ public class CharityMap implements Serializable {
     /** Every beneficiary on the map. */
     private final List<Beneficiary> beneficiaries;
 
-    /** Every distributor on the map. */
-    private final List<Distributor> distributors;
-
     /** The current Delaunay triangulation per aid type. */
     private transient Map<AidType, List<Triangle>> trianglesByType;
 
@@ -52,7 +49,7 @@ public class CharityMap implements Serializable {
         this.associations = new ArrayList<>();
         this.centers = new ArrayList<>();
         this.beneficiaries = new ArrayList<>();
-        this.distributors = new ArrayList<>();
+
         this.trianglesByType = new EnumMap<>(AidType.class);
         this.cellsByType = new EnumMap<>(AidType.class);
     }
@@ -119,26 +116,17 @@ public class CharityMap implements Serializable {
         }
     }
 
-    /**
-     * Registers a distributor on the map.
-     *
-     * @param distributor the distributor to add
-     */
-    public void addDistributor(Distributor distributor) {
-        if (distributor != null && !distributors.contains(distributor)) {
-            distributors.add(distributor);
-        }
-    }
+
 
     /**
-     * Removes a distributor from the map.
-     *
-     * @param distributor the distributor to remove
+     * Clears all centers, beneficiaries, associations, and distributors.
      */
-    public void removeDistributor(Distributor distributor) {
-        if (distributors.remove(distributor)) {
-            distributor.getHomeCenter().removeDistributor(distributor);
-        }
+    public void clear() {
+        this.centers.clear();
+        this.beneficiaries.clear();
+        this.associations.clear();
+
+        recompute();
     }
 
     /**
@@ -155,6 +143,18 @@ public class CharityMap implements Serializable {
         trianglesByType.clear();
         cellsByType.clear();
 
+        // Clamp coordinates of all centers and beneficiaries to ensure they stay within [0, 1000] boundaries
+        for (DistributionCenter c : centers) {
+            double cx = Math.max(0.0, Math.min(1000.0, c.getPosition().getX()));
+            double cy = Math.max(0.0, Math.min(1000.0, c.getPosition().getY()));
+            c.setPosition(new Point(cx, cy));
+        }
+        for (Beneficiary b : beneficiaries) {
+            double bx = Math.max(0.0, Math.min(1000.0, b.getPosition().getX()));
+            double by = Math.max(0.0, Math.min(1000.0, b.getPosition().getY()));
+            b.setPosition(new Point(bx, by));
+        }
+
         DelaunayTriangulator triangulator = new DelaunayTriangulator();
         VoronoiBuilder voronoiBuilder = new VoronoiBuilder();
 
@@ -164,12 +164,35 @@ public class CharityMap implements Serializable {
             for (DistributionCenter c : typeCenters) {
                 positions.add(c.getPosition());
             }
-            List<Triangle> triangles = triangulator.triangulate(positions);
+            List<Triangle> allTriangles = triangulator.triangulate(positions, true);
+            List<Triangle> filteredTriangles = triangulator.triangulate(positions, false);
             List<VoronoiCell> cells =
-                    voronoiBuilder.build(typeCenters, triangles);
-            trianglesByType.put(type, triangles);
+                    voronoiBuilder.build(typeCenters, allTriangles);
+            trianglesByType.put(type, filteredTriangles);
             cellsByType.put(type, cells);
         }
+        assignBeneficiaries();
+    }
+
+    /**
+     * Moves a center to a new position and recomputes the map.
+     *
+     * @param center      the center to move
+     * @param newPosition its new position
+     */
+    public void moveCenter(DistributionCenter center, Point newPosition) {
+        center.setPosition(newPosition);
+        recompute();
+    }
+
+    /**
+     * Moves a beneficiary to a new position and recomputes assignments.
+     *
+     * @param beneficiary the beneficiary to move
+     * @param newPosition its new position
+     */
+    public void moveBeneficiary(Beneficiary beneficiary, Point newPosition) {
+        beneficiary.setPosition(newPosition);
         assignBeneficiaries();
     }
 
@@ -245,6 +268,52 @@ public class CharityMap implements Serializable {
     }
 
     /**
+     * Returns the Delaunay triangulation of a given aid type.
+     *
+     * @param type the aid type
+     * @return the triangulation, never null
+     */
+    public List<Triangle> getTriangles(AidType type) {
+        if (trianglesByType == null) {
+            return new ArrayList<>();
+        }
+        List<Triangle> triangles = trianglesByType.get(type);
+        return (triangles == null) ? new ArrayList<>() : triangles;
+    }
+
+    /**
+     * Returns every triangle across all aid types.
+     *
+     * @return the complete list of triangles
+     */
+    public List<Triangle> getAllTriangles() {
+        List<Triangle> all = new ArrayList<>();
+        if (trianglesByType == null) {
+            return all;
+        }
+        for (List<Triangle> list : trianglesByType.values()) {
+            all.addAll(list);
+        }
+        return all;
+    }
+
+    /**
+     * Returns every Voronoi cell across all aid types.
+     *
+     * @return the complete list of cells
+     */
+    public List<VoronoiCell> getAllCells() {
+        List<VoronoiCell> all = new ArrayList<>();
+        if (cellsByType == null) {
+            return all;
+        }
+        for (List<VoronoiCell> list : cellsByType.values()) {
+            all.addAll(list);
+        }
+        return all;
+    }
+
+    /**
      * Returns every association.
      *
      * @return a copy of the associations list
@@ -270,14 +339,4 @@ public class CharityMap implements Serializable {
     public List<Beneficiary> getBeneficiaries() {
         return new ArrayList<>(beneficiaries);
     }
-
-    /**
-     * Returns every distributor.
-     *
-     * @return a copy of the distributors list
-     */
-    public List<Distributor> getDistributors() {
-        return new ArrayList<>(distributors);
-    }
 }
-

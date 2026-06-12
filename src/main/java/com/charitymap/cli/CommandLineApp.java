@@ -395,6 +395,4 @@ public class CommandLineApp {
         map.removeBeneficiary(target);
         System.out.println("Bénéficiaire supprimé.");
     }
-
-
-}
+}   
