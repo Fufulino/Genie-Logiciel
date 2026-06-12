@@ -53,7 +53,7 @@ public class CharityMapApp extends Application {
         root.setRight(detailsPanel);
 
         Scene scene = new Scene(root, 1000, 600);
-        primaryStage.setTitle("CharityMap - Version Simplifiée");
+        primaryStage.setTitle("CharityMap");
         primaryStage.setMinWidth(900);
         primaryStage.setMinHeight(500);
         primaryStage.setScene(scene);
