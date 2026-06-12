@@ -50,11 +50,11 @@ public class DetailsPanel extends VBox {
     }
 
     private static String formatGps(double x, double y) {
-        return String.format(Locale.US, "(%.5f, %.5f)", x, y);
+        return GeoProjection.formatGps(x, y);
     }
 
     private static String formatDistance(double distance) {
-        return String.format(Locale.US, "%.1f km", distance / 1000.0);
+        return GeoProjection.formatDistance(distance);
     }
 
     /**
