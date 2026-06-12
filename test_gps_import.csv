@@ -1,0 +1,9 @@
+# test_gps_import.csv
+# Format : Latitude, Longitude, Nom de l'association, Type d'aide (FOOD/CARE/CLOTHING)
+# Ces coordonnées réelles se situent à Cergy et seront projetées automatiquement sur la carte
+
+49.0405, 2.0435, Restos de l'Axe Majeur, FOOD
+49.0370, 2.0790, Croix Rouge Grand Bassin, CARE
+49.0490, 2.0380, Secours Populaire St Christophe, FOOD
+49.0320, 2.0550, Vestiaire Solidaire du Port, CLOTHING
+49.0550, 2.0680, Dispensaire de Cergy Village, CARE

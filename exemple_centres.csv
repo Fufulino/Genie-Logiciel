@@ -1,0 +1,10 @@
+# x,y,NomAssociation,TypeAide
+100,100,Secours Populaire,FOOD
+150,200,Secours Populaire,FOOD
+300,500,Secours Populaire,FOOD
+800,200,Medecins Sans Frontieres,CARE
+750,450,Medecins Sans Frontieres,CARE
+600,600,Medecins Sans Frontieres,CARE
+200,600,Emmaus,CLOTHING
+400,700,Emmaus,CLOTHING
+500,100,Emmaus,CLOTHING
