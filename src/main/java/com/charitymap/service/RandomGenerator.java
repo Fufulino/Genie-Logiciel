@@ -40,6 +40,20 @@ public class RandomGenerator {
         this.height = height;
     }
 
+    private Point randomPoint() {
+        return new Point(random.nextDouble() * width, random.nextDouble() * height);
+    }
+
+    // ── Legacy pixel-coordinate methods (backward compat) ─────────────────
+
+    public void addRandomBeneficiaries(CharityMap map, int count) {
+        AidType[] types = AidType.values();
+        for (int i = 0; i < count; i++) {
+            AidType need = types[random.nextInt(types.length)];
+            map.addBeneficiary(new Beneficiary(randomPoint(), need));
+        }
+    }
+
     /**
      * Adds a given number of beneficiaries at random positions inside the specified
      * latitude/longitude bounding box.
@@ -58,7 +72,7 @@ public class RandomGenerator {
      * @param projection a function used to convert the generated latitude/longitude
      *                   coordinates into a {@link Point} on the map
      */
-    public void addRandomBeneficiaries(CharityMap map, int count,
+    public void addRandomBeneficiariesInBounds(CharityMap map, int count,
             double minLng, double maxLng, double minLat, double maxLat,
             java.util.function.BiFunction<Double, Double, Point> projection) {
         AidType[] types = AidType.values();
