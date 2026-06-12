@@ -89,7 +89,7 @@ public class CharityMapApp extends Application {
         RandomGenerator gen = new RandomGenerator(800, 600);
         double marginLat = (GeoProjection.LAT_MAX - GeoProjection.LAT_MIN) * 0.02;
         double marginLon = (GeoProjection.LON_MAX - GeoProjection.LON_MIN) * 0.02;
-        gen.addRandomBeneficiariesInBounds(map, 80, 
+        gen.addRandomBeneficiaries(map, 80, 
             GeoProjection.LON_MIN + marginLon, GeoProjection.LON_MAX - marginLon, 
             GeoProjection.LAT_MIN + marginLat, GeoProjection.LAT_MAX - marginLat,
             GeoProjection::toPixel);
