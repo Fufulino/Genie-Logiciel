@@ -52,6 +52,9 @@ public class CommandLineApp {
         app.run();
     }
 
+    /*
+     * Loads demo data into the map.
+     */
     private void loadDemoData() {
         Association restos = new Association("Restos du Coeur", AidType.FOOD);
         Association croix = new Association("Croix Rouge", AidType.CARE);
@@ -69,6 +72,9 @@ public class CommandLineApp {
         map.recompute();
     }
 
+    /*
+     * Main loop of the command line application.
+     */
     private void run() {
         System.out.println("=== CharityMap - Cergy associations ===");
         boolean running = true;
