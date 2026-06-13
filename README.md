@@ -30,8 +30,15 @@ cd Genie-Logiciel
 
 C'est la méthode la plus simple car Maven s'occupe de télécharger automatiquement JavaFX et de tout configurer.
 
-- Lancer l'interface graphique : `mvn clean compile javafx:run`
-- Lancer la version console (CLI) : `mvn exec:java -Dexec.mainClass="com.charitymap.cli.CommandLineApp"`
+- **Interface graphique (GUI)** : 
+  ```bash
+  mvn clean compile javafx:run
+  ```
+- **Version console (CLI)** :
+  ```bash
+  # Utilisez cette syntaxe avec guillemets pour assurer la compatibilité (Windows PowerShell et Linux/macOS)
+  mvn exec:java "-Dexec.mainClass=com.charitymap.cli.CommandLineApp"
+  ```
 
 ### Méthode 2 : Depuis un IDE (IntelliJ IDEA, Eclipse, VS Code)
 
@@ -42,15 +49,22 @@ Vous pouvez tout à fait utiliser le projet sans aucune ligne de commande :
 
 ### Méthode 3 : Sans Maven du tout (Version CLI Uniquement)
 
-Si vous n'avez ni Maven ni un IDE, vous pouvez toujours compiler et lancer la version Console (qui n'a pas besoin de JavaFX) de manière standard avec le compilateur Java :
+Si vous n'avez ni Maven ni un IDE, vous pouvez compiler et lancer la version Console (qui n'a pas besoin de JavaFX) avec le compilateur Java standard :
 
-```bash
-# Compiler tous les fichiers Java dans un dossier "out"
-javac -d out $(find src/main/java -name "*.java")
-
-# Lancer le programme Console
-java -cp out com.charitymap.cli.CommandLineApp
-```
+- **Sur Linux / macOS (Bash) :**
+  ```bash
+  # Compiler les fichiers Java dans un dossier "out"
+  javac -d out $(find src/main/java -name "*.java")
+  ```
+- **Sur Windows (PowerShell) :**
+  ```powershell
+  # Compiler les fichiers Java dans un dossier "out"
+  javac -d out (Get-ChildItem -Recurse src/main/java/*.java | Resolve-Path)
+  ```
+- **Lancement :**
+  ```bash
+  java -cp out com.charitymap.cli.CommandLineApp
+  ```
 
 ### Génération de la Documentation (Javadoc)
 Pour générer la documentation technique complète du code :
