@@ -41,21 +41,25 @@ public class RandomGenerator {
     }
 
     /**
-     * Generates a random point within the configured bounds.
+     * Generates a random point inside the bounding box defined by 
+     * {@code width} and {@code height}.
      *
-     * @return a new random Point
+     * @return a new {@link Point} with random coordinates uniformly distributed 
+     * between 0 and the area dimensions.
      */
     private Point randomPoint() {
         return new Point(random.nextDouble() * width, random.nextDouble() * height);
     }
 
-    // ── Legacy pixel-coordinate methods (backward compat) ─────────────────
-
     /**
-     * Legacy method to add random beneficiaries using local coordinates.
+     * Adds a specified number of beneficiaries at random pixel coordinates 
+     * within the defined generator's area.
+     * <p>
+     * Each beneficiary is assigned a random {@link AidType}. This method uses 
+     * the legacy internal pixel coordinate system.
      *
-     * @param map   the CharityMap to populate
-     * @param count the number of beneficiaries to add
+     * @param map   the map that will receive the newly created beneficiaries
+     * @param count the number of beneficiaries to generate and add
      */
     public void addRandomBeneficiaries(CharityMap map, int count) {
         AidType[] types = AidType.values();
