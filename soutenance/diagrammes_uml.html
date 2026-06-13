@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CharityMap - Diagrammes UML</title>
+    <!-- Google Fonts: Outfit & Fira Code -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Mermaid.js loaded locally -->
+    <script src="mermaid.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(17, 24, 39, 0.7);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --primary-gradient: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+            --accent-pink: #ec4899;
+            --accent-purple: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --shadow-glow: 0 8px 32px 0 rgba(236, 72, 153, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(236, 72, 153, 0.03) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.03) 0%, transparent 40%);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 40px;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(11, 15, 25, 0.8);
+            backdrop-filter: blur(12px);
+            z-index: 100;
+            flex-shrink: 0;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--primary-gradient);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 20px;
+            box-shadow: 0 0 15px rgba(236, 72, 153, 0.4);
+        }
+
+        .logo-title {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #ffffff, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 16px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 14px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(236, 72, 153, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .tabs-bar {
+            display: flex;
+            justify-content: center;
+            background: rgba(10, 12, 22, 0.4);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 0;
+            gap: 20px;
+            flex-shrink: 0;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            padding: 12px 24px;
+            border-radius: 10px;
+            color: var(--text-secondary);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: #ffffff;
+            border-color: rgba(236, 72, 153, 0.3);
+        }
+
+        .tab-btn.active {
+            background: var(--primary-gradient);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .content-container {
+            position: relative;
+            flex-grow: 1;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            max-width: none;
+            overflow: hidden;
+        }
+
+        .tab-content {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .diagram-viewer {
+            background: rgba(0, 0, 0, 0.2);
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .viewer-toolbar {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 12px;
+        }
+
+        .tool-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tool-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+        }
+
+        .inspector-panel {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 420px;
+            background: rgba(11, 15, 25, 0.92);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid var(--border-color);
+            z-index: 150;
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            padding: 80px 24px 24px 24px;
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+        }
+
+        .inspector-panel.open {
+            transform: translateX(0);
+        }
+
+        .close-drawer-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 20px;
+            line-height: 1;
+            z-index: 160;
+        }
+
+        .close-drawer-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--accent-pink);
+            color: #ffffff;
+            transform: scale(1.08);
+        }
+
+        .inspector-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .inspector-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            color: #ffffff;
+        }
+
+        .inspector-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        /* SVG Class Diagram Styling */
+        .class-node {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .class-rect {
+            fill: #111827;
+            stroke: #3b82f6;
+            stroke-width: 2;
+            rx: 8;
+            ry: 8;
+            transition: all 0.3s ease;
+        }
+
+        .class-rect.package-model { stroke: #00d2ff; }
+        .class-rect.package-geometry { stroke: #ff9f00; }
+        .class-rect.package-service { stroke: #00ff87; }
+        .class-rect.package-gui { stroke: #a855f7; }
+
+        .class-node:hover .class-rect {
+            fill: #1f2937;
+            filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.4));
+        }
+
+        .class-text-header {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            fill: #ffffff;
+        }
+
+        .class-text-body {
+            font-family: 'Fira Code', monospace;
+            font-size: 10px;
+            fill: #9ca3af;
+        }
+
+        .relation-line {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.15);
+            stroke-width: 1.5;
+            transition: all 0.3s ease;
+        }
+
+        .relation-line.hovered {
+            stroke: #ec4899;
+            stroke-width: 3;
+            filter: drop-shadow(0 0 5px rgba(236, 72, 153, 0.8));
+        }
+
+        .relation-arrow {
+            fill: rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .relation-arrow.hovered {
+            fill: #ec4899;
+        }
+
+        /* Use Case Diagram Styling */
+        .actor-circle {
+            fill: #1e293b;
+            stroke: #f472b6;
+            stroke-width: 2.5;
+        }
+
+        .actor-line {
+            stroke: #f472b6;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+        }
+
+        .usecase-ellipse {
+            fill: #0f172a;
+            stroke: #3b82f6;
+            stroke-width: 2;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .usecase-node:hover .usecase-ellipse {
+            fill: #1e293b;
+            stroke: #60a5fa;
+            filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.5));
+        }
+
+        .usecase-text {
+            font-family: 'Outfit', sans-serif;
+            font-size: 12px;
+            fill: #ffffff;
+            font-weight: 500;
+            text-anchor: middle;
+        }
+
+        .usecase-relation {
+            fill: none;
+            stroke: #94a3b8;
+            stroke-width: 1.5;
+            stroke-dasharray: 4;
+        }
+
+        .relation-label {
+            font-family: 'Fira Code', monospace;
+            font-size: 10px;
+            fill: #60a5fa;
+        }
+
+        .legend-bar {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            padding: 12px 24px;
+            border-radius: 14px;
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            max-width: 90%;
+            pointer-events: auto;
+            font-size: 13px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        /* Custom Mermaid Styling to match premium dark theme */
+        .mermaid svg {
+            background: transparent !important;
+            height: auto !important;
+            max-width: 100% !important;
+        }
+        .mermaid .node {
+            cursor: pointer !important;
+        }
+        .mermaid .node path {
+            transition: fill 0.2s ease, stroke 0.2s ease !important;
+        }
+        .mermaid .node text {
+            font-family: 'Outfit', sans-serif !important;
+            fill: #f3f4f6 !important;
+        }
+        .mermaid .node .classLabel text {
+            font-weight: 600 !important;
+        }
+        .mermaid .node .labelText {
+            font-family: 'Fira Code', monospace !important;
+            font-size: 11px !important;
+            fill: #9ca3af !important;
+        }
+        .mermaid .edgePath .path {
+            stroke: rgba(255, 255, 255, 0.2) !important;
+            stroke-width: 1.5px !important;
+        }
+        .mermaid .edgeThickness1 {
+            stroke-width: 1.5px !important;
+        }
+        .mermaid .edgeLabel text {
+            font-family: 'Fira Code', monospace !important;
+            font-size: 10px !important;
+            fill: #a855f7 !important;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <div class="logo-icon">U</div>
+            <div class="logo-title">CharityMap — Modélisation UML</div>
+        </div>
+        <div class="header-nav">
+            <a href="carte_interactive.html" class="nav-btn">
+                <span>🗺️</span> Carte Interactive
+            </a>
+            <a href="fonctionnement_technique.html" class="nav-btn">
+                <span>⚙️</span> Coulisses Techniques
+            </a>
+            <a href="structure_projet.html" class="nav-btn">
+                <span>📂</span> Structure Projet
+            </a>
+            <a href="methodes_amir.html" class="nav-btn">
+                <span>🔍</span> Méthodes (Amir)
+            </a>
+        </div>
+    </header>
+
+    <div class="tabs-bar">
+        <button class="tab-btn active" onclick="switchTab('class-diagram')">
+            <span>📐</span> Diagramme de Classes
+        </button>
+        <button class="tab-btn" onclick="switchTab('usecase-diagram')">
+            <span>👤</span> Cas d'Utilisation
+        </button>
+    </div>
+
+    <div class="content-container">
+        
+        <!-- Tab 1: Class Diagram -->
+        <div class="tab-content active" id="class-diagram">
+            <div class="diagram-viewer">
+                <div class="viewer-toolbar">
+                    <button class="tool-btn" onclick="zoomIn()">➕ Zoom</button>
+                    <button class="tool-btn" onclick="zoomOut()">➖ Dézoom</button>
+                    <button class="tool-btn" onclick="resetZoom()">🔄 Centrer</button>
+                    <button class="tool-btn toggle-inspector-btn" onclick="toggleInspector()">📋 Détails</button>
+                </div>
+                <div id="class-diagram-svg" style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; overflow: hidden;">
+                    <div class="zoom-pan-wrapper" style="transform-origin: center center; transition: transform 0.05s ease-out; width: 100%; height: 100%;">
+                        <pre class="mermaid" style="margin: 0; padding: 20px; text-align: left;">
+classDiagram
+    direction TB
+    
+    class CharityMapApp {
+        -ControlPanel controlPanel
+        -MapCanvas mapCanvas
+        -DetailsPanel detailsPanel
+        -CharityMap charityMap
+        +main(args) void
+        +start(stage) void
+    }
+    class ControlPanel {
+        -CharityMap charityMap
+        -MapCanvas mapCanvas
+        -DetailsPanel detailsPanel
+        -Button addCenterBtn
+        -Button removeCenterBtn
+        -Button addBeneficiaryBtn
+        -Button addNRandomBtn
+        -Button removeBeneficiaryBtn
+        -CheckBox showVoronoiCb
+        -CheckBox showDelaunayCb
+        -CheckBox showLinksCb
+        -CheckBox showCircumcirclesCb
+        -RadioButton allRadio
+        -RadioButton foodRadio
+        -RadioButton careRadio
+        -RadioButton clothingRadio
+        -Button importCsvBtn
+        -Button saveBinaryBtn
+        -Button loadBinaryBtn
+        -Label statsLabel
+        +updateStatistics() void
+    }
+    class DetailsPanel {
+        -GridPane statsGrid
+        -DistributionCenter activeCenter
+        -Beneficiary activeBeneficiary
+        +showCenterDetails(c, map) void
+        +showBeneficiaryDetails(b) void
+        +clearDetails() void
+        +updateStatistics(map) void
+    }
+    class MapCanvas {
+        -CharityMap charityMap
+        -DetailsPanel detailsPanel
+        -Canvas canvas
+        -double scale
+        -double offsetX
+        -double offsetY
+        -Object selectedElement
+        -Object hoveredElement
+        -AidType filterType
+        -boolean showVoronoi
+        -boolean showDelaunay
+        -boolean showLinks
+        -boolean showCircumcircles
+        +refreshMap() void
+        +screenToWorld(sx, sy) Point
+        +worldToScreen(wx, wy) doubleArr
+        +setShowVoronoi(show) void
+        +setShowDelaunay(show) void
+        +setShowLinks(show) void
+        +setShowCircumcircles(show) void
+        +setSelectedCenter(c) void
+        +setSelectedBeneficiary(b) void
+        +setFilterType(t) void
+    }
+    class MapPainter {
+        -GraphicsContext gc
+        +paintGrid(gc, scale, offset) void
+        +paintVoronoi(gc, cells, filter) void
+        +paintDelaunay(gc, triangles) void
+        +paintLinks(gc, beneficiaries) void
+        +paintCircumcircles(gc, triangles) void
+        +paintCenters(gc, centers, sel, hov) void
+        +paintBeneficiaries(gc, list, sel, hov) void
+    }
+    class GeoProjection {
+        +projectX(lon, width) double
+        +projectY(lat, height) double
+    }
+    class CommandLineApp {
+        -CharityMap map
+        +CommandLineApp(map)
+        +start() void
+        -printMenu() void
+        -handleChoice(choice) void
+        -importCsvInteractive() void
+        -removeCenterInteractive() void
+        -removeBeneficiaryInteractive() void
+    }
+    class CsvImporter {
+        +importCenters(map, path) int
+    }
+    class MapIO {
+        +save(map, path) void
+        +load(path) CharityMap
+    }
+    class RandomGenerator {
+        +generateCenters(map, count) void
+        +generateBeneficiaries(map, count) void
+    }
+    class GeometryUtils {
+        +circumcenter(a, b, c) Point$
+        +polygonArea(vertices) double$
+        +centroid(points) Point$
+        +angleFromCenter(center, p) double$
+    }
+    class DelaunayTriangulator {
+        +triangulate(points) List
+        +triangulate(points, keepSuper) List
+    }
+    class Triangle {
+        -Point a
+        -Point b
+        -Point c
+        +Triangle(a, b, c)
+        +getCircumcenter() Point
+        +circumcircleContains(p) boolean
+        +sharesVertexWith(v1, v2, v3) boolean
+        +hasVertex(p) boolean
+        +getA() Point
+        +getB() Point
+        +getC() Point
+    }
+    class VoronoiBuilder {
+        +build(centers, triangles) List
+    }
+    class VoronoiCell {
+        -DistributionCenter center
+        -List corners
+        +VoronoiCell(center)
+        +addCorner(p) void
+        +sortCorners() void
+        +getArea() double
+        +getAverageTravelDistance() double
+        +getMaxTravelDistance() double
+        +getCenter() DistributionCenter
+        +getCorners() List
+    }
+    class CharityMap {
+        -List centers
+        -List beneficiaries
+        -Map trianglesByType
+        -Map cellsByType
+        +addCenter(c) void
+        +removeCenter(c) void
+        +addBeneficiary(b) void
+        +removeBeneficiary(b) void
+        +assignBeneficiaries() void
+        +recomputeGeometry() void
+        +moveCenter(c, newPos) void
+        +moveBeneficiary(b, newPos) void
+        +getCenters() List
+        +getBeneficiaries() List
+        +getTriangles(type) List
+        +getCells(type) List
+        +getAllTriangles() List
+        +getAllCells() List
+    }
+    class DistributionCenter {
+        -int id
+        -Point position
+        -Association association
+        -List linkedBeneficiaries
+        +getId() int
+        +getPosition() Point
+        +setPosition(pos) void
+        +getAssociation() Association
+        +getAidType() AidType
+        +getLinkedBeneficiaries() List
+        +linkBeneficiary(b) void
+        +unlinkBeneficiary(b) void
+        +clearLinkedBeneficiaries() void
+    }
+    class Beneficiary {
+        -int id
+        -Point position
+        -AidType need
+        -DistributionCenter assignedCenter
+        +getId() int
+        +getPosition() Point
+        +setPosition(pos) void
+        +getNeed() AidType
+        +getAssignedCenter() DistributionCenter
+        +setAssignedCenter(c) void
+        +getDistanceToCenter() double
+    }
+    class Association {
+        -String name
+        -AidType type
+        -List centers
+        +getName() String
+        +getAidType() AidType
+        +getCenters() List
+        +addCenter(c) void
+        +removeCenter(c) void
+    }
+    class Point {
+        -double x
+        -double y
+        +Point(x, y)
+        +getX() double
+        +getY() double
+        +distanceTo(other) double
+        +squaredDistanceTo(other) double
+    }
+    class AidType {
+        FOOD
+        CARE
+        CLOTHING
+    }
+
+    CharityMapApp --> CharityMap : uses
+    CommandLineApp --> CharityMap : uses
+    ControlPanel --> CharityMapApp : interacts
+    DetailsPanel --> CharityMapApp : observes
+    MapCanvas --> CharityMapApp : draws
+    MapPainter --> MapCanvas : delegate
+    MapCanvas --> GeoProjection : projection
+    ControlPanel ..> CsvImporter : import
+    ControlPanel ..> MapIO : persistence
+    ControlPanel ..> RandomGenerator : generate
+    CommandLineApp ..> CsvImporter : import
+    CommandLineApp ..> MapIO : persistence
+    CommandLineApp ..> RandomGenerator : generate
+    CsvImporter --> CharityMap : adds
+    MapIO --> CharityMap : serialize
+    RandomGenerator --> CharityMap : populate
+    CharityMap ..> DelaunayTriangulator : triangulation
+    CharityMap ..> VoronoiBuilder : voronoi
+    DelaunayTriangulator ..> Triangle : creates
+    VoronoiBuilder ..> VoronoiCell : creates
+    Triangle ..> GeometryUtils : uses
+    VoronoiCell ..> GeometryUtils : uses
+    CharityMap *-- DistributionCenter
+    CharityMap *-- Beneficiary
+    DistributionCenter --> Association : owns
+    Association --> AidType : type
+    DistributionCenter *-- Point
+    Beneficiary *-- Point
+    Beneficiary --> DistributionCenter : assigned
+                        </pre>
+                    </div>
+                </div>
+
+                <div class="legend-bar">
+                    <div class="legend-item"><div class="legend-color" style="background:#00d2ff"></div> <span>com.charitymap.model</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background:#ff9f00"></div> <span>com.charitymap.geometry</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background:#00ff87"></div> <span>com.charitymap.service</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background:#a855f7"></div> <span>com.charitymap.gui</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background:#64748b"></div> <span>com.charitymap.cli</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background:#8b5cf6"></div> <span>Relation Composition</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background:#3b82f6"></div> <span>Relation Association</span></div>
+                </div>
+            </div>
+
+            <!-- Class Inspector -->
+            <div class="inspector-panel" id="class-inspector">
+                <button class="close-drawer-btn" onclick="closeInspector()">×</button>
+                <div class="inspector-card">
+                    <h3 class="inspector-title">⚙️ Relation active</h3>
+                    <p class="inspector-text" id="relation-desc" style="font-style:italic;">
+                        Survolez une ligne de relation du diagramme UML pour afficher ses détails techniques et son rôle dans la programmation orientée objet du projet.
+                    </p>
+                </div>
+                <div class="inspector-card">
+                    <h3 class="inspector-title">📁 Classe Inspectée</h3>
+                    <div id="class-detail">
+                        <p class="inspector-text">Cliquez sur une boîte de classe pour afficher sa fiche descriptive pour la soutenance.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Use Case Diagram -->
+        <div class="tab-content" id="usecase-diagram">
+            <div class="diagram-viewer">
+                <div class="viewer-toolbar">
+                    <button class="tool-btn" onclick="zoomIn()">➕ Zoom</button>
+                    <button class="tool-btn" onclick="zoomOut()">➖ Dézoom</button>
+                    <button class="tool-btn" onclick="resetZoom()">🔄 Centrer</button>
+                    <button class="tool-btn toggle-inspector-btn" onclick="toggleInspector()">📋 Détails</button>
+                </div>
+                <svg id="usecase-diagram-svg" width="100%" height="100%" viewBox="0 0 1150 980" style="background:transparent;">
+                    <g class="zoom-pan-wrapper" style="transform-origin: center center; transition: transform 0.05s ease-out;">
+                    
+                    <!-- System Boundary Box -->
+                    <rect x="260" y="40" width="670" height="910" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="2" rx="12" ry="12"/>
+                    <text x="595" y="70" fill="rgba(255,255,255,0.4)" font-weight="bold" font-size="12" letter-spacing="2" text-anchor="middle">SYSTEM : CharityMap App</text>
+
+                    <!-- ACTORS -->
+                    <!-- Actor: Utilisateur (IHM / CLI) -->
+                    <g class="usecase-node" onmouseover="showUcaseInfo('Acteur : Utilisateur', 'Il s\'agit de l\'acteur physique principal qui interagit avec l\'application via l\'IHM JavaFX graphique ou la ligne de commande CLI.')">
+                        <!-- Stick figure -->
+                        <circle cx="100" cy="460" r="18" class="actor-circle"/>
+                        <line x1="100" y1="478" x2="100" y2="540" class="actor-line"/>
+                        <line x1="100" y1="495" x2="70" y2="520" class="actor-line"/>
+                        <line x1="100" y1="495" x2="130" y2="520" class="actor-line"/>
+                        <line x1="100" y1="540" x2="75" y2="590" class="actor-line"/>
+                        <line x1="100" y1="540" x2="125" y2="590" class="actor-line"/>
+                        <text x="100" y="620" fill="#ffffff" font-weight="bold" font-size="14" text-anchor="middle">Utilisateur</text>
+                    </g>
+
+                    <!-- Actor: Fichier CSV -->
+                    <g class="usecase-node" onmouseover="showUcaseInfo('Acteur : Fichier CSV', 'Acteur système secondaire. Représente la source d\'importation des centres de distribution.')">
+                        <rect x="50" y="700" width="100" height="80" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+                        <text x="100" y="745" fill="#10b981" font-weight="bold" font-size="14" text-anchor="middle">Fichier CSV</text>
+                    </g>
+
+                    <!-- Actor: Système de Fichiers Binaire -->
+                    <g class="usecase-node" onmouseover="showUcaseInfo('Acteur : Système Fichier', 'Acteur système gérant la persistance binaire (sauvegarde et chargement de la carte).')">
+                        <rect x="980" y="620" width="100" height="80" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+                        <text x="1030" y="665" fill="#f59e0b" font-weight="bold" font-size="14" text-anchor="middle">Disque (.map)</text>
+                    </g>
+
+                    <!-- CONNECTIONS (Associations) -->
+                    <!-- Utilisateur Connections -->
+                    <line x1="140" y1="480" x2="330" y2="100" stroke="rgba(255, 255, 255, 0.2)" stroke-width="1.5"/>
+                    <line x1="140" y1="490" x2="330" y2="180" stroke="rgba(255, 255, 255, 0.2)" stroke-width="1.5"/>
+                    <line x1="140" y1="500" x2="330" y2="260" stroke="rgba(255, 255, 255, 0.2)" stroke-width="1.5"/>
+                    <line x1="140" y1="510" x2="330" y2="340" stroke="rgba(255, 255, 255, 0.2)" stroke-width="1.5"/>
+                    <line x1="140" y1="520" x2="330" y2="420" stroke="rgba(255, 255, 255, 0.2)" stroke-width="1.5"/>
+                    <line x1="140" y1="530" x2="330" y2="500" stroke="rgba(255, 255, 255, 0.2)" stroke-width="1.5"/>
+                    <line x1="140" y1="540" x2="330" y2="580" stroke="rgba(255, 255, 255, 0.2)" stroke-width="1.5"/>
+                    <line x1="140" y1="550" x2="330" y2="660" stroke="rgba(255, 255, 255, 0.2)" stroke-width="1.5"/>
+                    <line x1="140" y1="560" x2="330" y2="740" stroke="rgba(255, 255, 255, 0.2)" stroke-width="1.5"/>
+                    <line x1="140" y1="570" x2="330" y2="820" stroke="rgba(255, 255, 255, 0.2)" stroke-width="1.5"/>
+                    <line x1="140" y1="580" x2="330" y2="900" stroke="rgba(255, 255, 255, 0.2)" stroke-width="1.5"/>
+
+                    <!-- Secondary Actors Connections -->
+                    <line x1="150" y1="740" x2="330" y2="590" stroke="#10b981" stroke-width="1.5"/>
+                    <line x1="980" y1="660" x2="570" y2="660" stroke="#f59e0b" stroke-width="1.5"/>
+
+                    <!-- USE CASE ELLIPSES -->
+                    <!-- UC 1: Ajouter un Centre -->
+                    <g class="usecase-node" onclick="showUcaseInfo('Cas d\'usage : Ajouter un Centre', 'Permet à l\'utilisateur d\'ajouter un centre de distribution sur la carte. Inclus obligatoirement la création ou réutilisation d\'une Association et d\'un type d\'aide.')">
+                        <ellipse cx="450" cy="100" rx="120" ry="30" class="usecase-ellipse"/>
+                        <text x="450" y="104" class="usecase-text">Ajouter un Centre</text>
+                    </g>
+
+                    <!-- UC 2: Ajouter un Bénéficiaire -->
+                    <g class="usecase-node" onclick="showUcaseInfo('Cas d\'usage : Ajouter un Bénéficiaire', 'Permet d\'ajouter un bénéficiaire dans le besoin. Inclus obligatoirement l\'affectation automatique de ce bénéficiaire au centre de secours le plus proche selon son besoin.')">
+                        <ellipse cx="450" cy="180" rx="120" ry="30" class="usecase-ellipse"/>
+                        <text x="450" y="184" class="usecase-text">Ajouter un Bénéficiaire</text>
+                    </g>
+                    <!-- Include link UC: Calculer affectation -->
+                    <path d="M 570 180 L 720 180" class="usecase-relation" marker-end="url(#arrow)"/>
+                    <text x="645" y="172" class="relation-label" text-anchor="middle">&lt;&lt;include&gt;&gt;</text>
+                    <g class="usecase-node" onclick="showUcaseInfo('Sous cas : Calculer l\'affectation', 'Calcul automatique déclenché lors de la création d\'un bénéficiaire pour l\'associer au centre de secours optimal du même type d\'aide.')">
+                        <ellipse cx="830" cy="180" rx="100" ry="30" class="usecase-ellipse" stroke="#10b981"/>
+                        <text x="830" y="184" class="usecase-text">Calculer affectation</text>
+                    </g>
+
+                    <!-- UC 3: Supprimer un Centre -->
+                    <g class="usecase-node" onclick="showUcaseInfo('Cas d\'usage : Supprimer un Centre', 'Retire un centre de secours de la carte. Cette suppression entraîne le recalcul automatique des zones de Voronoï et la réaffectation des bénéficiaires.')">
+                        <ellipse cx="450" cy="260" rx="120" ry="30" class="usecase-ellipse"/>
+                        <text x="450" y="264" class="usecase-text">Supprimer un Centre</text>
+                    </g>
+
+                    <!-- UC 4: Supprimer un Bénéficiaire -->
+                    <g class="usecase-node" onclick="showUcaseInfo('Cas d\'usage : Supprimer un Bénéficiaire', 'Retire un bénéficiaire de la carte, libérant sa charge du centre de distribution auquel il était affecté.')">
+                        <ellipse cx="450" cy="340" rx="120" ry="30" class="usecase-ellipse"/>
+                        <text x="450" y="344" class="usecase-text">Supprimer un Bénéficiaire</text>
+                    </g>
+
+                    <!-- UC 5: Générer des points aléatoires -->
+                    <g class="usecase-node" onclick="showUcaseInfo('Cas d\'usage : Générer points aléatoires', 'Génère instantanément un nombre N de bénéficiaires ou de centres répartis de manière aléatoire sur la zone de Cergy pour tester la simulation.')">
+                        <ellipse cx="450" cy="420" rx="120" ry="30" class="usecase-ellipse"/>
+                        <text x="450" y="424" class="usecase-text">Générer points aléatoires</text>
+                    </g>
+
+                    <!-- UC 6: Glisser-déposer un point -->
+                    <g class="usecase-node" onclick="showUcaseInfo('Cas d\'usage : Glisser-déposer (IHM)', 'Interaction directe de drag & drop sur le canevas JavaFX pour repositionner un centre ou un bénéficiaire. Inclut la régénération des structures géométriques.')">
+                        <ellipse cx="450" cy="500" rx="120" ry="30" class="usecase-ellipse"/>
+                        <text x="450" y="504" class="usecase-text">Glisser-déposer (IHM)</text>
+                    </g>
+                    <!-- Include link UC: Recalculer Delaunay/Voronoi -->
+                    <path d="M 570 500 L 720 500" class="usecase-relation" marker-end="url(#arrow)"/>
+                    <text x="645" y="492" class="relation-label" text-anchor="middle">&lt;&lt;include&gt;&gt;</text>
+                    <g class="usecase-node" onclick="showUcaseInfo('Sous cas : Recalculer Delaunay &amp; Voronoi', 'Pipeline de recalculs automatiques du maillage de Delaunay et des zones de Voronoi suite au déplacement d\'un centre.')">
+                        <ellipse cx="830" cy="500" rx="100" ry="30" class="usecase-ellipse" stroke="#10b981"/>
+                        <text x="830" y="504" class="usecase-text">Recalculer structures</text>
+                    </g>
+
+                    <!-- UC 7: Importer via CSV -->
+                    <g class="usecase-node" onclick="showUcaseInfo('Cas d\'usage : Importer des centres via CSV', 'Permet le chargement massif et robuste de centres de distribution d\'aides depuis un fichier tabulé CSV.')">
+                        <ellipse cx="450" cy="580" rx="120" ry="30" class="usecase-ellipse"/>
+                        <text x="450" y="584" class="usecase-text">Importer via CSV</text>
+                    </g>
+
+                    <!-- UC 8: Sauvegarder & Charger -->
+                    <g class="usecase-node" onclick="showUcaseInfo('Cas d\'usage : Sauvegarder / Charger', 'Permet à l\'utilisateur d\'enregistrer l\'état complet de la carte en binaire ou de le restaurer plus tard.')">
+                        <ellipse cx="450" cy="660" rx="120" ry="30" class="usecase-ellipse"/>
+                        <text x="450" y="664" class="usecase-text">Sauvegarder / Charger</text>
+                    </g>
+
+                    <!-- UC 9: Suivre Distributeurs & Stats -->
+                    <g class="usecase-node" onclick="showUcaseInfo('Cas d\'usage : Suivre Stats &amp; Distributeurs', 'Consulter le nombre de distributeurs sur le terrain, calculer les charges par distributeur, et identifier les zones de tension sociale.')">
+                        <ellipse cx="450" cy="740" rx="120" ry="30" class="usecase-ellipse"/>
+                        <text x="450" y="744" class="usecase-text">Suivre Stats &amp; Distributeurs</text>
+                    </g>
+
+                    <!-- UC 10: Filtrer par type d'aide -->
+                    <g class="usecase-node" onclick="showUcaseInfo('Cas d\'usage : Filtrer par type d\'aide', 'Filtre l\'affichage de la carte et du réseau pour se concentrer uniquement sur les aides alimentaires (FOOD), médicales (CARE) ou vestimentaires (CLOTHING).')">
+                        <ellipse cx="450" cy="820" rx="120" ry="30" class="usecase-ellipse"/>
+                        <text x="450" y="824" class="usecase-text">Filtrer par type d'aide</text>
+                    </g>
+
+                    <!-- UC 11: Naviguer sur la carte -->
+                    <g class="usecase-node" onclick="showUcaseInfo('Cas d\'usage : Naviguer sur la carte', 'Permet de se déplacer sur la carte (Pan) et d\'ajuster l\'échelle (Zoom) à l\'aide de la souris pour analyser les zones denses.')">
+                        <ellipse cx="450" cy="900" rx="120" ry="30" class="usecase-ellipse"/>
+                        <text x="450" y="904" class="usecase-text">Naviguer sur la carte</text>
+                    </g>
+
+                    </g>
+                </svg>
+            </div>
+
+            <!-- Use Case Inspector -->
+            <div class="inspector-panel" id="usecase-inspector">
+                <button class="close-drawer-btn" onclick="closeInspector()">×</button>
+                <div class="inspector-card">
+                    <h3 class="inspector-title">ℹ️ Inspecteur de Cas d'Usage</h3>
+                    <div id="usecase-detail">
+                        <p class="inspector-text">Survolez un acteur ou cliquez sur un cas d'usage du diagramme pour afficher ses spécifications détaillées.</p>
+                    </div>
+                </div>
+                <div class="inspector-card">
+                    <h3 class="inspector-title">💡 Utilité pour la Soutenance</h3>
+                    <p class="inspector-text">
+                        Présentez ce diagramme pour prouver que l'IHM JavaFX et les lignes de commande CLI répondent exactement aux besoins des utilisateurs finaux (ergonomie, import CSV robuste et sauvegarde binaire).
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Tab manager
+        function switchTab(tabId) {
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(t => t.classList.remove('active'));
+
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach(btn => btn.classList.remove('active'));
+
+            const activeTab = document.getElementById(tabId);
+            activeTab.classList.add('active');
+
+            // Find target button
+            const targetBtn = Array.from(tabBtns).find(btn => btn.getAttribute('onclick').includes(tabId));
+            if (targetBtn) {
+                targetBtn.classList.add('active');
+            }
+
+            // Close all drawers when changing tabs
+            document.querySelectorAll('.inspector-panel').forEach(p => p.classList.remove('open'));
+
+            // Set active SVG ID for zoom/pan
+            const svg = activeTab.querySelector('svg');
+            if (svg) {
+                if (svg.id.startsWith('mermaid-') || svg.classList.contains('mermaid')) {
+                    activeSvgId = 'class-diagram-svg';
+                } else {
+                    activeSvgId = svg.id;
+                }
+            }
+        }
+
+        // Relation hovering
+        function highlightRelation(element, text) {
+            element.classList.add('hovered');
+            document.getElementById('relation-desc').innerHTML = text;
+            const markerEnd = element.getAttribute('marker-end');
+            if (markerEnd) {
+                element.setAttribute('marker-end', 'url(#arrow-hover)');
+            }
+        }
+
+        function clearRelation() {
+            const lines = document.querySelectorAll('.relation-line');
+            lines.forEach(l => {
+                l.classList.remove('hovered');
+                l.setAttribute('marker-end', 'url(#arrow)');
+            });
+            document.getElementById('relation-desc').innerHTML = "Survolez une ligne de relation du diagramme UML pour afficher ses détails techniques.";
+        }
+
+        // Class selector database
+        const classSpecs = {
+            'CharityMap': {
+                name: "CharityMap.java",
+                pkg: "com.charitymap.model",
+                desc: "Le noyau fonctionnel du projet. Il encapsule l'état complet du système, gère les listes ordonnées de centres et de bénéficiaires, coordonne les affectations géométriques de plus proche voisin par besoin, et orchestre le recalcul automatique des triangulations de Delaunay et des diagrammes de Voronoï par type d'aide.",
+                methods: "<b>Constructeur :</b><br>" +
+                         "- CharityMap()<br><br>" +
+                         "<b>Accesseurs & Modificateurs :</b><br>" +
+                         "+ getCenters(): List&lt;DistributionCenter&gt;<br>" +
+                         "+ getBeneficiaries(): List&lt;Beneficiary&gt;<br>" +
+                         "+ getTriangles(type: AidType): List&lt;Triangle&gt;<br>" +
+                         "+ getCells(type: AidType): List&lt;VoronoiCell&gt;<br>" +
+                         "+ getAllTriangles(): List&lt;Triangle&gt;<br>" +
+                         "+ getAllCells(): List&lt;VoronoiCell&gt;<br><br>" +
+                         "<b>Gestion des Données (CRUD) :</b><br>" +
+                         "+ addCenter(c: DistributionCenter): void<br>" +
+                         "+ removeCenter(c: DistributionCenter): void<br>" +
+                         "+ addBeneficiary(b: Beneficiary): void<br>" +
+                         "+ removeBeneficiary(b: Beneficiary): void<br><br>" +
+                         "<b>Algorithmes & Géométrie :</b><br>" +
+                         "+ assignBeneficiaries(): void (Calcul de plus proche voisin)<br>" +
+                         "+ recomputeGeometry(): void (Bowyer-Watson & Dual de Voronoï)<br>" +
+                         "+ moveCenter(c: DistributionCenter, newPos: Point): void<br>" +
+                         "+ moveBeneficiary(b: Beneficiary, newPos: Point): void"
+             },
+            'DistributionCenter': {
+                name: "DistributionCenter.java",
+                pkg: "com.charitymap.model",
+                desc: "Représente un centre de secours physique. Il est détenu par une association unique, fournit une aide spécifique et maintient la liste dynamique de tous les bénéficiaires qui lui sont rattachés géographiquement.",
+                methods: "<b>Constructeur :</b><br>" +
+                         "- DistributionCenter(pos: Point, assoc: Association)<br><br>" +
+                         "<b>Accesseurs & Modificateurs :</b><br>" +
+                         "+ getId(): int<br>" +
+                         "+ getPosition(): Point<br>" +
+                         "+ setPosition(pos: Point): void<br>" +
+                         "+ getAssociation(): Association<br>" +
+                         "+ getAidType(): AidType<br>" +
+                         "+ getLinkedBeneficiaries(): List&lt;Beneficiary&gt;<br><br>" +
+                         "<b>Gestion de Rôle :</b><br>" +
+                         "+ linkBeneficiary(b: Beneficiary): void<br>" +
+                         "+ unlinkBeneficiary(b: Beneficiary): void<br>" +
+                         "+ clearLinkedBeneficiaries(): void<br><br>" +
+                         "<b>Affichage :</b><br>" +
+                         "+ toString(): String"
+            },
+            'Beneficiary': {
+                name: "Beneficiary.java",
+                pkg: "com.charitymap.model",
+                desc: "Représente une personne dans le besoin localisée sur le plan. Un bénéficiaire possède un type de besoin fixe (FOOD, CARE, CLOTHING) et se voit attribuer le centre d'aide le plus proche proposant ce type d'aide.",
+                methods: "<b>Constructeur :</b><br>" +
+                         "- Beneficiary(pos: Point, need: AidType)<br><br>" +
+                         "<b>Accesseurs & Modificateurs :</b><br>" +
+                         "+ getId(): int<br>" +
+                         "+ getPosition(): Point<br>" +
+                         "+ setPosition(pos: Point): void<br>" +
+                         "+ getNeed(): AidType<br>" +
+                         "+ getAssignedCenter(): DistributionCenter<br>" +
+                         "+ setAssignedCenter(c: DistributionCenter): void<br>" +
+                         "+ getDistanceToCenter(): double<br><br>" +
+                         "<b>Affichage :</b><br>" +
+                         "+ toString(): String"
+            },
+            'Association': {
+                name: "Association.java",
+                pkg: "com.charitymap.model",
+                desc: "Une association humanitaire propriétaire de plusieurs centres de secours. Elle possède un nom unique et un type d'aide constant pour tous ses centres associés.",
+                methods: "<b>Constructeur :</b><br>" +
+                         "- Association(name: String, type: AidType)<br><br>" +
+                         "<b>Accesseurs :</b><br>" +
+                         "+ getName(): String<br>" +
+                         "+ getAidType(): AidType<br>" +
+                         "+ getCenters(): List&lt;DistributionCenter&gt;<br><br>" +
+                         "<b>Gestion de Centres :</b><br>" +
+                         "+ addCenter(c: DistributionCenter): void<br>" +
+                         "+ removeCenter(c: DistributionCenter): void<br><br>" +
+                         "<b>Affichage :</b><br>" +
+                         "+ toString(): String"
+            },
+            'Point': {
+                name: "Point.java",
+                pkg: "com.charitymap.model",
+                desc: "Une classe immuable représentant des coordonnées cartésiennes en 2D. Elle sert d'ossature géométrique pour positionner tous les acteurs et calculer les distances.",
+                methods: "<b>Constructeur :</b><br>" +
+                         "- Point(x: double, y: double)<br><br>" +
+                         "<b>Accesseurs :</b><br>" +
+                         "+ getX(): double<br>" +
+                         "+ getY(): double<br><br>" +
+                         "<b>Calculs Géométriques :</b><br>" +
+                         "+ distanceTo(other: Point): double (Distance euclidienne)<br>" +
+                         "+ squaredDistanceTo(other: Point): double<br><br>" +
+                         "<b>Comparaisons & Sérialisation :</b><br>" +
+                         "+ equals(obj: Object): boolean<br>" +
+                         "+ hashCode(): int<br>" +
+                         "+ toString(): String"
+            },
+            'AidType': {
+                name: "AidType.java",
+                pkg: "com.charitymap.model",
+                desc: "Énumération définissant les trois types de besoins d'aide humanitaire pris en charge par l'application.",
+                methods: "<b>Valeurs Constantes :</b><br>" +
+                         "- FOOD : Aide Alimentaire (Vert)<br>" +
+                         "- CARE : Soins Médicaux (Orange)<br>" +
+                         "- CLOTHING : Dons de Vêtements (Violet)"
+            },
+            'DelaunayTriangulator': {
+                name: "DelaunayTriangulator.java",
+                pkg: "com.charitymap.geometry",
+                desc: "Implémentation de l'algorithme incrémental de Bowyer-Watson pour trianguler un nuage de points 2D. Il crée d'abord un super-triangle, puis insère les points un à un en identifiant et éliminant les triangles dont les cercles circonscrits contiennent la nouvelle position.",
+                methods: "<b>Méthodes de Triangulation :</b><br>" +
+                         "+ triangulate(points: List&lt;Point&gt;): List&lt;Triangle&gt;<br>" +
+                         "+ triangulate(points: List&lt;Point&gt;, keepSuper: boolean): List&lt;Triangle&gt;"
+            },
+            'Triangle': {
+                name: "Triangle.java",
+                pkg: "com.charitymap.geometry",
+                desc: "Structure géométrique reliant 3 points. Contient des formules trigonométriques complexes pour trouver les coordonnées du centre circonscrit et déterminer si un point est situé dans le cercle circonscrit.",
+                methods: "<b>Constructeur :</b><br>" +
+                         "- Triangle(a: Point, b: Point, c: Point)<br><br>" +
+                         "<b>Accesseurs :</b><br>" +
+                         "+ getA(): Point<br>" +
+                         "+ getB(): Point<br>" +
+                         "+ getC(): Point<br><br>" +
+                         "<b>Calculs Trigonométriques :</b><br>" +
+                         "+ getCircumcenter(): Point (Calcul du barycentre circonscrit)<br>" +
+                         "+ circumcircleContains(p: Point): boolean (Test du cercle circonscrit)<br>" +
+                         "+ sharesVertexWith(v1: Point, v2: Point, v3: Point): boolean<br>" +
+                         "+ hasVertex(p: Point): boolean<br><br>" +
+                         "<b>Affichage :</b><br>" +
+                         "+ toString(): String"
+            },
+            'VoronoiBuilder': {
+                name: "VoronoiBuilder.java",
+                pkg: "com.charitymap.geometry",
+                desc: "Algorithme de construction du diagramme de Voronoï par dualité de Delaunay. Pour chaque centre de distribution, il regroupe les triangles de Delaunay adjacents et relie leurs circoncentres respectifs pour former la frontière polygonale de la cellule de Voronoï.",
+                methods: "<b>Calcul de Voronoï :</b><br>" +
+                         "+ build(centers: List&lt;DistributionCenter&gt;, triangles: List&lt;Triangle&gt;): List&lt;VoronoiCell&gt;"
+            },
+            'VoronoiCell': {
+                name: "VoronoiCell.java",
+                pkg: "com.charitymap.geometry",
+                desc: "Représente le polygone délimitant la zone de couverture d'un centre. Il stocke les sommets géométriques, calcule l'aire par intégration de Stokes et évalue les performances d'accès (distances moyenne et maximale de transport pour les bénéficiaires).",
+                methods: "<b>Constructeur :</b><br>" +
+                         "- VoronoiCell(center: DistributionCenter)<br><br>" +
+                         "<b>Accesseurs & Modificateurs :</b><br>" +
+                         "+ getCenter(): DistributionCenter<br>" +
+                         "+ getCorners(): List&lt;Point&gt;<br>" +
+                         "+ addCorner(p: Point): void<br><br>" +
+                         "<b>Calculs Mathématiques :</b><br>" +
+                         "+ sortCorners(): void (Tri trigonométrique pour tracé géométrique correct)<br>" +
+                         "+ getArea(): double (Intégrale de Gauss / aire du polygone)<br>" +
+                         "+ getAverageTravelDistance(): double (Moyenne de transport)<br>" +
+                         "+ getMaxTravelDistance(): double (Distance d'accès la plus éloignée)"
+            },
+            'GeometryUtils': {
+                name: "GeometryUtils.java",
+                pkg: "com.charitymap.geometry",
+                desc: "Boîte à outils de calculs géométriques statiques. Contient des fonctions pures pour calculer le centre circonscrit de triangles, l'aire de polygones par la formule du lacet de soulier, le centroïde d'un nuage de points et des tris polaires.",
+                methods: "<b>Méthodes Statiques :</b><br>" +
+                         "+ circumcenter(a: Point, b: Point, c: Point): Point$<br>" +
+                         "+ polygonArea(vertices: List&lt;Point&gt;): double$<br>" +
+                         "+ centroid(points: List&lt;Point&gt;): Point$<br>" +
+                         "+ angleFromCenter(center: Point, p: Point): double$"
+            },
+            'CharityMapApp': {
+                name: "CharityMapApp.java",
+                pkg: "com.charitymap.gui",
+                desc: "Classe d'entrée principale JavaFX. Elle configure la fenêtre d'affichage, assemble les panneaux ControlPanel (gauche), MapCanvas (centre) et DetailsPanel (droite), applique la feuille de style styles.css, et charge les données initiales de démonstration.",
+                methods: "<b>Accesseurs & Actions :</b><br>" +
+                         "+ main(args: String[]): void<br>" +
+                         "+ start(stage: Stage): void (Cycle de vie JavaFX)"
+            },
+            'ControlPanel': {
+                name: "ControlPanel.java",
+                pkg: "com.charitymap.gui",
+                desc: "Composant d'interface latérale gauche. Il rassemble tous les boutons de saisie interactive (ajout de centres d'aide avec formulaires, ajout de bénéficiaires individuels ou aléatoires, boutons de suppression, filtres radio de types d'aide, et boutons d'import/export de données).",
+                methods: "<b>Constructeur :</b><br>" +
+                         "+ ControlPanel(map: CharityMap, canvas: MapCanvas, details: DetailsPanel)<br><br>" +
+                         "<b>Mise à jour :</b><br>" +
+                         "+ updateStatistics(): void"
+            },
+            'DetailsPanel': {
+                name: "DetailsPanel.java",
+                pkg: "com.charitymap.gui",
+                desc: "Composant d'interface latérale droite. Il extrait et formate dynamiquement les statistiques de l'élément sélectionné par l'utilisateur (aire de Voronoï, nombre de bénéficiaires assignés, distances de trajet). Affiche également un récapitulatif global si aucune sélection n'est active.",
+                methods: "<b>Constructeur & Rendu :</b><br>" +
+                         "+ DetailsPanel()<br><br>" +
+                         "<b>Mise à jour de fiches :</b><br>" +
+                         "+ showCenterDetails(c: DistributionCenter, map: CharityMap): void<br>" +
+                         "+ showBeneficiaryDetails(b: Beneficiary): void<br>" +
+                         "+ clearDetails(): void<br>" +
+                         "+ updateStatistics(map: CharityMap): void"
+            },
+            'MapCanvas': {
+                name: "MapCanvas.java",
+                pkg: "com.charitymap.gui",
+                desc: "Composant central interactif de dessin. Il capture les événements de souris (molette pour le zoom, glisser avec le clic droit/milieu pour le défilement/pan, clic gauche pour la sélection, et glisser-déposer pour le déplacement direct de points en temps réel).",
+                methods: "<b>Constructeur :</b><br>" +
+                         "+ MapCanvas(map: CharityMap, details: DetailsPanel)<br><br>" +
+                         "<b>Calculs de Rendu :</b><br>" +
+                         "+ refreshMap(): void<br>" +
+                         "+ screenToWorld(sx: double, sy: double): Point (Conversion d'écran en repère virtuel)<br>" +
+                         "+ worldToScreen(wx: double, wy: double): double[] (Conversion virtuelle en pixels)"
+            },
+            'MapPainter': {
+                name: "MapPainter.java",
+                pkg: "com.charitymap.gui",
+                desc: "Classe utilitaire de dessin isolant le rendu 2D graphique du Canvas. Elle prend en charge le tracé des polygones semi-transparents de Voronoï, des lignes bleues pointillées de Delaunay, des liens de rattachement, des cercles circonscrits, et des icônes de centres de secours et de bénéficiaires.",
+                methods: "<b>Dessins Graphiques :</b><br>" +
+                         "+ paintGrid(gc: GraphicsContext, scale: double, offset: double[]): void<br>" +
+                         "+ paintVoronoi(gc: GraphicsContext, cells: List&lt;VoronoiCell&gt;, filter: AidType): void<br>" +
+                         "+ paintDelaunay(gc: GraphicsContext, triangles: List&lt;Triangle&gt;): void<br>" +
+                         "+ paintLinks(gc: GraphicsContext, beneficiaries: List&lt;Beneficiary&gt;): void<br>" +
+                         "+ paintCircumcircles(gc: GraphicsContext, triangles: List&lt;Triangle&gt;): void<br>" +
+                         "+ paintCenters(gc: GraphicsContext, centers: List&lt;DistributionCenter&gt;, sel: DistributionCenter, hov: DistributionCenter): void<br>" +
+                         "+ paintBeneficiaries(gc: GraphicsContext, list: List&lt;Beneficiary&gt;, sel: Beneficiary, hov: Beneficiary): void"
+            },
+            'GeoProjection': {
+                name: "GeoProjection.java",
+                pkg: "com.charitymap.gui",
+                desc: "Service de projection géographique. Il applique des ratios d'échelle linéaires et de décalage pour projeter fidèlement des coordonnées réelles GPS de la ville de Cergy (Latitude/Longitude) sur une grille de pixels 2D plane.",
+                methods: "<b>Calculs de Projection :</b><br>" +
+                         "+ projectX(lon: double, width: double): double<br>" +
+                         "+ projectY(lat: double, height: double): double"
+            },
+            'CommandLineApp': {
+                name: "CommandLineApp.java",
+                pkg: "com.charitymap.cli",
+                desc: "Application console (CLI) fournissant une boucle interactive textuelle de commande (`stdin` / `stdout`). Offre un menu complet pour ajouter, déplacer ou supprimer des points, et afficher sous forme de tableaux structurés les affectations.",
+                methods: "<b>Cycle de vie CLI :</b><br>" +
+                         "+ CommandLineApp(map: CharityMap)<br>" +
+                         "+ start(): void<br>" +
+                         "+ printMenu(): void<br>" +
+                         "+ handleChoice(choice: int): void"
+            },
+            'CsvImporter': {
+                name: "CsvImporter.java",
+                pkg: "com.charitymap.service",
+                desc: "Service d'importation de fichiers textes structurés CSV. Lit les colonnes `X;Y;Association;AidType`, ignore les commentaires commençant par `#` et ignore silencieusement les lignes malformées sans générer d'erreurs fatales pour l'application.",
+                methods: "<b>Import CSV :</b><br>" +
+                         "+ importCenters(map: CharityMap, path: String): int"
+            },
+            'MapIO': {
+                name: "MapIO.java",
+                pkg: "com.charitymap.service",
+                desc: "Service de persistance binaire robuste. Sauvegarde et charge l'état complet du CharityMap (points, associations, affectations) dans un fichier binaire `.map` en gérant la sérialisation Java ObjectOutputStream.",
+                methods: "<b>Persistance :</b><br>" +
+                         "+ save(map: CharityMap, path: String): void<br>" +
+                         "+ load(path: String): CharityMap"
+            },
+            'RandomGenerator': {
+                name: "RandomGenerator.java",
+                pkg: "com.charitymap.service",
+                desc: "Classe de génération aléatoire d'entités de simulation. Calcule des coordonnées cartésiennes de manière pseudo-aléatoire uniforme dans la boîte englobante de la zone géographique de Cergy.",
+                methods: "<b>Générateur de Simulation :</b><br>" +
+                         "+ generateCenters(map: CharityMap, count: int): void<br>" +
+                         "+ generateBeneficiaries(map: CharityMap, count: int): void"
+            }
+        };
+
+        function selectClass(classId) {
+            const data = classSpecs[classId];
+            if (!data) return;
+
+            document.getElementById('class-detail').innerHTML = `
+                <h4 style="color:#ffffff; font-size:16px; margin-bottom:6px;">${data.name}</h4>
+                <p style="font-family:'Fira Code', monospace; font-size:11px; color:#a855f7; margin-bottom:12px;">package ${data.pkg}</p>
+                <p class="inspector-text" style="margin-bottom:12px; line-height:1.5;">${data.desc}</p>
+                <h5 style="color:#ffffff; font-size:13px; margin-bottom:6px; text-transform:uppercase;">Méthodes clés :</h5>
+                <p style="font-family:'Fira Code', monospace; font-size:11px; color:#fbbf24; line-height:1.5;">${data.methods}</p>
+            `;
+            openInspector();
+        }
+
+        // Use case info manager
+        function showUcaseInfo(title, description) {
+            document.getElementById('usecase-detail').innerHTML = `
+                <h4 style="color:#ffffff; font-size:16px; margin-bottom:8px;">${title}</h4>
+                <p class="inspector-text" style="line-height:1.5;">${description}</p>
+            `;
+            openInspector();
+        }
+
+        // --- Drawer Control Helpers ---
+        function openInspector() {
+            const activeTab = document.querySelector('.tab-content.active');
+            if (activeTab) {
+                const panel = activeTab.querySelector('.inspector-panel');
+                if (panel) {
+                    panel.classList.add('open');
+                }
+            }
+        }
+
+        function closeInspector() {
+            const activeTab = document.querySelector('.tab-content.active');
+            if (activeTab) {
+                const panel = activeTab.querySelector('.inspector-panel');
+                if (panel) {
+                    panel.classList.remove('open');
+                }
+            }
+        }
+
+        function toggleInspector() {
+            const activeTab = document.querySelector('.tab-content.active');
+            if (activeTab) {
+                const panel = activeTab.querySelector('.inspector-panel');
+                if (panel) {
+                    panel.classList.toggle('open');
+                }
+            }
+        }
+
+        // --- Panning & Zooming logic ---
+        let transformStates = {
+            'class-diagram-svg': { x: 0, y: 0, s: 0.95 },
+            'usecase-diagram-svg': { x: 0, y: 0, s: 0.85 }
+        };
+
+        let activeSvgId = 'class-diagram-svg';
+        let isPanning = false;
+        let startX, startY;
+
+        function getActiveSvg() {
+            return document.getElementById(activeSvgId);
+        }
+
+        function applyTransform(svgId) {
+            const state = transformStates[svgId];
+            const wrapper = document.getElementById(svgId).querySelector('.zoom-pan-wrapper');
+            if (wrapper) {
+                wrapper.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.s})`;
+            }
+        }
+
+        // Setup mouse drag panning
+        document.querySelectorAll('.diagram-viewer').forEach(viewer => {
+            viewer.addEventListener('mousedown', e => {
+                // Ignore dragging if clicked on toolbar, legend, class/usecase nodes
+                if (e.target.closest('.class-node') || e.target.closest('.usecase-node') || 
+                    e.target.closest('.viewer-toolbar') || e.target.closest('.legend-bar') ||
+                    e.target.closest('.node')) return;
+                
+                isPanning = true;
+                const tabContent = viewer.closest('.tab-content');
+                activeSvgId = tabContent.id === 'class-diagram' ? 'class-diagram-svg' : 'usecase-diagram-svg';
+                
+                const state = transformStates[activeSvgId];
+                startX = e.clientX - state.x;
+                startY = e.clientY - state.y;
+                viewer.style.cursor = 'grabbing';
+            });
+        });
+
+        window.addEventListener('mousemove', e => {
+            if (!isPanning) return;
+            const state = transformStates[activeSvgId];
+            state.x = e.clientX - startX;
+            state.y = e.clientY - startY;
+            applyTransform(activeSvgId);
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (isPanning) {
+                isPanning = false;
+                document.querySelectorAll('.diagram-viewer').forEach(v => v.style.cursor = 'default');
+            }
+        });
+
+        // Setup wheel zooming
+        document.querySelectorAll('.diagram-viewer').forEach(viewer => {
+            viewer.addEventListener('wheel', e => {
+                e.preventDefault();
+                const tabContent = viewer.closest('.tab-content');
+                activeSvgId = tabContent.id === 'class-diagram' ? 'class-diagram-svg' : 'usecase-diagram-svg';
+                
+                const state = transformStates[activeSvgId];
+                const factor = e.deltaY < 0 ? 1.05 : 0.95;
+                state.s = Math.min(Math.max(state.s * factor, 0.4), 3);
+                applyTransform(activeSvgId);
+            }, { passive: false });
+        });
+
+        // Toolbar functions
+        function zoomIn() {
+            const state = transformStates[activeSvgId];
+            if (!state) return;
+            state.s = Math.min(state.s * 1.1, 3);
+            applyTransform(activeSvgId);
+        }
+
+        function zoomOut() {
+            const state = transformStates[activeSvgId];
+            if (!state) return;
+            state.s = Math.max(state.s * 0.9, 0.4);
+            applyTransform(activeSvgId);
+        }
+
+        function resetZoom() {
+            const state = transformStates[activeSvgId];
+            if (!state) return;
+            state.x = 0;
+            state.y = 0;
+            state.s = activeSvgId === 'class-diagram-svg' ? 0.95 : 0.85;
+            applyTransform(activeSvgId);
+        }
+
+        // Initialize transforms on load
+        window.addEventListener('DOMContentLoaded', () => {
+            // Initialize Mermaid with custom security level for clicks
+            mermaid.initialize({
+                startOnLoad: true,
+                securityLevel: 'loose',
+                theme: 'dark'
+            });
+            applyTransform('class-diagram-svg');
+            applyTransform('usecase-diagram-svg');
+
+            // Handle Mermaid class clicks via event delegation
+            document.body.addEventListener('click', function(e) {
+                const node = e.target.closest('.node');
+                if (!node) return;
+                
+                // Mermaid v11: ID format is mermaid-XXXX-classId-ClassName-N
+                if (node.id) {
+                    const match = node.id.match(/classId-([A-Za-z]+)-/);
+                    if (match && match[1] && window.selectClass) {
+                        window.selectClass(match[1]);
+                    }
+                }
+            });
+
+            // Colorize class nodes by package after Mermaid finishes rendering
+            const packageColors = {
+                gui:      '#a855f7',
+                cli:      '#64748b',
+                service:  '#00ff87',
+                geometry: '#ff9f00',
+                model:    '#00d2ff'
+            };
+            const packageFills = {
+                gui:      '#160a2b', // violet foncé
+                cli:      '#141822', // gris ardoise très foncé
+                service:  '#041f12', // vert foncé
+                geometry: '#261600', // orange/ambre très foncé
+                model:    '#001b26'  // bleu/cyan très foncé
+            };
+            const packageHoverFills = {
+                gui:      '#27124a', 
+                cli:      '#202534', 
+                service:  '#083d24', 
+                geometry: '#402500', 
+                model:    '#002e40'  
+            };
+            const classToPackage = {
+                'CharityMapApp': 'gui', 'ControlPanel': 'gui', 'DetailsPanel': 'gui',
+                'MapCanvas': 'gui', 'MapPainter': 'gui', 'GeoProjection': 'gui',
+                'CommandLineApp': 'cli',
+                'CsvImporter': 'service', 'MapIO': 'service', 'RandomGenerator': 'service',
+                'DelaunayTriangulator': 'geometry', 'Triangle': 'geometry',
+                'VoronoiBuilder': 'geometry', 'VoronoiCell': 'geometry', 'GeometryUtils': 'geometry',
+                'CharityMap': 'model', 'DistributionCenter': 'model', 'Beneficiary': 'model',
+                'Association': 'model', 'Point': 'model', 'AidType': 'model'
+            };
+
+            function colorizePackages() {
+                const nodes = document.querySelectorAll('#class-diagram-svg .node');
+                nodes.forEach(node => {
+                    // Mermaid v11: ID = mermaid-XXXX-classId-ClassName-N
+                    let className = '';
+                    if (node.id) {
+                        const m = node.id.match(/classId-([A-Za-z]+)-/);
+                        if (m) className = m[1];
+                    }
+                    const pkg = classToPackage[className];
+                    if (pkg) {
+                        const color = packageColors[pkg];
+                        const fillColor = packageFills[pkg];
+                        const hoverFillColor = packageHoverFills[pkg];
+                        
+                        let fillPath = null;
+                        
+                        // Mermaid v11 uses <path> for borders, not <rect>
+                        node.querySelectorAll('path').forEach(path => {
+                            const currentStroke = path.getAttribute('stroke');
+                            const currentFill = path.getAttribute('fill');
+                            
+                            // Modifier la couleur de bordure (stroke)
+                            if (currentStroke && currentStroke !== 'none') {
+                                path.setAttribute('stroke', color);
+                                path.setAttribute('stroke-width', '2.5');
+                            }
+                            
+                            // Modifier la couleur de fond (fill)
+                            if (!currentStroke || currentStroke === 'none') {
+                                if (currentFill && currentFill !== 'none') {
+                                    fillPath = path;
+                                    path.setAttribute('fill', fillColor);
+                                }
+                            }
+                        });
+                        
+                        if (fillPath) {
+                            node.addEventListener('mouseenter', () => {
+                                fillPath.setAttribute('fill', hoverFillColor);
+                            });
+                            node.addEventListener('mouseleave', () => {
+                                fillPath.setAttribute('fill', fillColor);
+                            });
+                        }
+                        
+                        // Colorer les lignes de séparation internes (dividers)
+                        node.querySelectorAll('line').forEach(line => {
+                            line.setAttribute('stroke', color);
+                        });
+                    }
+                });
+            }
+
+            // Mermaid renders asynchronously; retry until nodes appear
+            let retries = 0;
+            const colorInterval = setInterval(() => {
+                const nodes = document.querySelectorAll('#class-diagram-svg .node');
+                retries++;
+                if (nodes.length > 0 || retries > 20) {
+                    clearInterval(colorInterval);
+                    if (nodes.length > 0) colorizePackages();
+                }
+            }, 300);
+        });
+</script>
+</body>
+</html>
