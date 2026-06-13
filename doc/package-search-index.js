@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.charitymap.cli"},{"l":"com.charitymap.geometry"},{"l":"com.charitymap.gui"},{"l":"com.charitymap.model"},{"l":"com.charitymap.service"}];updateSearchResults();

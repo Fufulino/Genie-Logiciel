@@ -1,0 +1,5 @@
+com.charitymap.cli
+com.charitymap.geometry
+com.charitymap.gui
+com.charitymap.model
+com.charitymap.service
