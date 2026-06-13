@@ -17,11 +17,22 @@ import java.util.Locale;
 
 /**
  * Right-side details display panel.
+ * <p>
+ * This panel provides descriptive context, statistics, and analysis recommendations 
+ * whenever a user interacts with map elements like beneficiaries, distribution centers, 
+ * or Delaunay triangles.
+ * </p>
+ * * @author CharityMap team
  */
 public class DetailsPanel extends VBox {
 
+    /** Label displaying the section title or selected entity name. */
     private final Label titleLabel;
+
+    /** Label containing detailed formatted information about the selected entity. */
     private final Label detailsLabel;
+
+    /** Label at the bottom of the panel showcasing global map statistics. */
     private final Label statsLabel;
 
     /**
@@ -49,10 +60,23 @@ public class DetailsPanel extends VBox {
         clearDetails();
     }
 
+    /**
+     * Formats internal map coordinates into a readable GPS string.
+     *
+     * @param x the X coordinate in the map system
+     * @param y the Y coordinate in the map system
+     * @return a formatted representation of the GPS coordinates
+     */
     private static String formatGps(double x, double y) {
         return GeoProjection.formatGps(x, y);
     }
 
+    /**
+     * Formats a raw distance value into a localized readable string (e.g., meters or kilometers).
+     *
+     * @param distance the distance value to format
+     * @return a formatted distance string with its unit
+     */
     private static String formatDistance(double distance) {
         return GeoProjection.formatDistance(distance);
     }
@@ -67,6 +91,10 @@ public class DetailsPanel extends VBox {
 
     /**
      * Displays details of a selected distribution center.
+     * <p>
+     * Includes association information, type of aid, linked beneficiaries count, and 
+     * associated Voronoi cell geometric metrics if available.
+     * </p>
      *
      * @param center the selected distribution center
      * @param map    the global map container
@@ -102,6 +130,10 @@ public class DetailsPanel extends VBox {
 
     /**
      * Displays details of a selected beneficiary.
+     * <p>
+     * Shows their specific need, position, and information regarding their assigned 
+     * distribution center if one has been resolved.
+     * </p>
      *
      * @param b the selected beneficiary
      */
@@ -122,6 +154,10 @@ public class DetailsPanel extends VBox {
 
     /**
      * Displays analysis details of a selected Delaunay triangle.
+     * <p>
+     * Computes real-world areas, lengths, load balance imbalances between the three vertices 
+     * (distribution centers), and returns automated network optimization recommendations.
+     * </p>
      *
      * @param t   the selected Delaunay triangle
      * @param map the global map container

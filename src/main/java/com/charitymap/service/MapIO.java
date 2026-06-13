@@ -48,7 +48,6 @@ public class MapIO {
                         "This file does not contain a charity map.");
             }
             CharityMap map = (CharityMap) content;
-            // The Voronoi structures are transient, so rebuild them.
             map.recompute();
             return map;
         }
