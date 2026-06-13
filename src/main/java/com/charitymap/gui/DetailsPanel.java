@@ -35,7 +35,7 @@ public class DetailsPanel extends VBox {
         setPadding(new Insets(15));
         setStyle("-fx-background-color: #f8fafc; -fx-border-color: #cbd5e1; -fx-border-width: 0 0 0 1px;");
 
-        titleLabel = new Label("Propriétés");
+        titleLabel = new Label("Properties");
         titleLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
 
         detailsLabel = new Label();
@@ -61,8 +61,8 @@ public class DetailsPanel extends VBox {
      * Resets details to a default placeholder message.
      */
     public void clearDetails() {
-        titleLabel.setText("Détails");
-        detailsLabel.setText("Cliquez sur un élément de la carte.");
+        titleLabel.setText("Details");
+        detailsLabel.setText("Click on an element on the map.");
     }
 
     /**
@@ -72,11 +72,11 @@ public class DetailsPanel extends VBox {
      * @param map    the global map container
      */
     public void showCenterDetails(DistributionCenter center, CharityMap map) {
-        titleLabel.setText("Centre #" + center.getId());
+        titleLabel.setText("Center #" + center.getId());
         String info = "Association: " + center.getAssociation().getName() + "\n"
-                    + "Aide: " + center.getAidType() + "\n"
+                    + "Aid: " + center.getAidType() + "\n"
                     + "GPS: " + formatGps(center.getPosition().getX(), center.getPosition().getY()) + "\n"
-                    + "Bénéficiaires affectés: " + center.getLinkedBeneficiaries().size() + "\n";
+                    + "Affected beneficiaries: " + center.getLinkedBeneficiaries().size() + "\n";
 
         VoronoiCell cell = null;
         for (VoronoiCell c : map.getAllCells()) {
@@ -92,10 +92,10 @@ public class DetailsPanel extends VBox {
                 ? String.format("%.2f km²", areaM2 / 1_000_000.0) 
                 : String.format("%.1f ha", areaM2 / 10000.0);
                 
-            info += "\n[Statistiques Voronoi]\n"
-                  + "Couverture: " + areaStr + "\n"
-                  + "Dist. moyenne: " + formatDistance(cell.getAverageTravelDistance()) + "\n"
-                  + "Dist. max: " + formatDistance(cell.getMaxTravelDistance());
+            info += "\n[Voronoi Statistics]\n"
+                  + "Coverage: " + areaStr + "\n"
+                  + "Average dist.: " + formatDistance(cell.getAverageTravelDistance()) + "\n"
+                  + "Max dist.: " + formatDistance(cell.getMaxTravelDistance());
         }
         detailsLabel.setText(info);
     }
@@ -106,16 +106,16 @@ public class DetailsPanel extends VBox {
      * @param b the selected beneficiary
      */
     public void showBeneficiaryDetails(Beneficiary b) {
-        titleLabel.setText("Bénéficiaire #" + b.getId());
-        String info = "Besoin: " + b.getNeed() + "\n"
+        titleLabel.setText("Beneficiary #" + b.getId());
+        String info = "Need: " + b.getNeed() + "\n"
                     + "GPS: " + formatGps(b.getPosition().getX(), b.getPosition().getY()) + "\n";
         
         if (b.getAssignedCenter() != null) {
-            info += "\nCentre assigné:\n"
+            info += "\nAssigned center:\n"
                   + b.getAssignedCenter().getAssociation().getName() + " #" + b.getAssignedCenter().getId() + "\n"
                   + "Distance: " + formatDistance(b.distanceToAssignedCenter());
         } else {
-            info += "\nCentre assigné: Aucun";
+            info += "\nAssigned center: None";
         }
         detailsLabel.setText(info);
     }
@@ -127,7 +127,7 @@ public class DetailsPanel extends VBox {
      * @param map the global map container
      */
     public void showTriangleDetails(Triangle t, CharityMap map) {
-        titleLabel.setText("Triangle Delaunay");
+        titleLabel.setText("Delaunay Triangle");
         
         DistributionCenter centerA = null, centerB = null, centerC = null;
         for (DistributionCenter c : map.getCenters()) {
@@ -154,23 +154,23 @@ public class DetailsPanel extends VBox {
         double dBC = t.getB().distanceTo(t.getC()) * 5.7;
         double dCA = t.getC().distanceTo(t.getA()) * 5.7;
         
-        String density = (areaPixels < 20000) ? "Zone Dense" : "Zone Désertique/Dispersée";
+        String density = (areaPixels < 20000) ? "Dense Zone" : "Deserted/Dispersed Zone";
         String recommendation = (areaPixels > 80000) 
-            ? "Déséquilibre : distances importantes. Suggère d'ajouter un nouveau centre près du centre circonscrit pour optimiser la couverture."
-            : "La couverture est optimale pour cette zone.";
+            ? "Imbalance: large distances. Suggests adding a new center near the circumcenter to optimize coverage."
+            : "Coverage is optimal for this area.";
             
-        String info = "Sommets (Centres) :\n"
-                    + "- Centre A (ID " + (centerA != null ? centerA.getId() : "?") + ") : " + bA + " bénéficiaires\n"
-                    + "- Centre B (ID " + (centerB != null ? centerB.getId() : "?") + ") : " + bB + " bénéficiaires\n"
-                    + "- Centre C (ID " + (centerC != null ? centerC.getId() : "?") + ") : " + bC + " bénéficiaires\n\n"
-                    + "Déséquilibre (Max - Min) : " + diff + " bénéficiaires\n"
-                    + "Densité de zone : " + density + "\n"
-                    + "Surface : " + areaStr + "\n"
-                    + "Longueurs des côtés :\n"
-                    + "  A-B : " + String.format("%.0f m", dAB) + "\n"
-                    + "  B-C : " + String.format("%.0f m", dBC) + "\n"
-                    + "  C-A : " + String.format("%.0f m", dCA) + "\n\n"
-                    + "Recommandation :\n" + recommendation;
+        String info = "Vertices (Centers):\n"
+                    + "- Center A (ID " + (centerA != null ? centerA.getId() : "?") + ") : " + bA + " beneficiaries\n"
+                    + "- Center B (ID " + (centerB != null ? centerB.getId() : "?") + ") : " + bB + " beneficiaries\n"
+                    + "- Center C (ID " + (centerC != null ? centerC.getId() : "?") + ") : " + bC + " beneficiaries\n\n"
+                    + "Imbalance (Max - Min): " + diff + " beneficiaries\n"
+                    + "Zone density: " + density + "\n"
+                    + "Area: " + areaStr + "\n"
+                    + "Side lengths:\n"
+                    + "  A-B: " + String.format("%.0f m", dAB) + "\n"
+                    + "  B-C: " + String.format("%.0f m", dBC) + "\n"
+                    + "  C-A: " + String.format("%.0f m", dCA) + "\n\n"
+                    + "Recommendation:\n" + recommendation;
                     
         detailsLabel.setText(info);
     }
@@ -181,7 +181,7 @@ public class DetailsPanel extends VBox {
      * @param map the global map container
      */
     public void updateStatistics(CharityMap map) {
-        statsLabel.setText(String.format("Stats Globales:\n- %d Centres\n- %d Bénéficiaires",
+        statsLabel.setText(String.format("Global Stats:\n- %d Centers\n- %d Beneficiaries",
                 map.getCenters().size(), map.getBeneficiaries().size()));
     }
 }

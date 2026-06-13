@@ -29,6 +29,11 @@ import java.util.List;
 public class DelaunayTriangulator {
 
     /**
+     * Default constructor for DelaunayTriangulator.
+     */
+    public DelaunayTriangulator() {}
+
+    /**
      * A simple pair of points representing one edge of a triangle.
      * Used while rebuilding the boundary of the polygonal hole.
      */

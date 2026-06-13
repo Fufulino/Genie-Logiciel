@@ -148,12 +148,12 @@ public class VoronoiCell implements Serializable {
     public String statisticsReport() {
         StringBuilder sb = new StringBuilder();
         sb.append("Coverage zone of ").append(center).append("\n");
-        sb.append("  Beneficiaries covered : ")
+        sb.append("  Covered beneficiaries: ")
                 .append(getBeneficiaryCount()).append("\n");
         sb.append("  Average travel distance: ")
                 .append(String.format("%.2f", getAverageTravelDistance()))
                 .append("\n");
-        sb.append("  Maximum travel distance: ")
+        sb.append("  Max travel distance    : ")
                 .append(String.format("%.2f", getMaxTravelDistance()))
                 .append("\n");
         sb.append("  Zone area              : ")

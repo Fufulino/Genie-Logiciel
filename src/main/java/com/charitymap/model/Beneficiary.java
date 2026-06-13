@@ -132,7 +132,7 @@ public class Beneficiary implements Serializable {
                 ? "no center"
                 : ("center #" + assignedCenter.getId());
         return "Beneficiary #" + id + " " + position
-                + " needs " + need.getLabel() + ", linked to " + target;
+                + " needs " + need.getLabel() + ", assigned to " + target;
     }
 }
 

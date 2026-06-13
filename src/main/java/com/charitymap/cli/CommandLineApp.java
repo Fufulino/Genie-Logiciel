@@ -82,10 +82,10 @@ public class CommandLineApp {
             try {
                 running = handleChoice(choice);
             } catch (Exception e) {
-                System.out.println("L'opération n'a pas pu être finalisée : " + e.getMessage());
+                System.out.println("Operation could not be completed: " + e.getMessage());
             }
         }
-        System.out.println("Au revoir.");
+        System.out.println("Goodbye.");
     }
 
     /**
@@ -93,20 +93,21 @@ public class CommandLineApp {
      */
     private void printMenu() {
         System.out.println();
-        System.out.println("1. Lister les centres de distribution");
-        System.out.println("2. Lister les bénéficiaires et leurs affectations");
-        System.out.println("3. Afficher les statistiques par zone de couverture");
-        System.out.println("4. Ajouter un centre de distribution");
-        System.out.println("5. Ajouter des bénéficiaires aléatoires");
-        System.out.println("6. Déplacer un centre de distribution");
-        System.out.println("7. Sauvegarder la carte dans un fichier binaire");
-        System.out.println("8. Charger une carte depuis un fichier binaire");
-        System.out.println("9. Importer des centres depuis un CSV");
-        System.out.println("10. Supprimer un centre de distribution");
-        System.out.println("11. Supprimer un bénéficiaire");
+        System.out.println("1. List distribution centers");
+        System.out.println("2. List beneficiaries and their assignments");
+        System.out.println("3. Display coverage zone statistics");
+        System.out.println("4. Add a distribution center");
+        System.out.println("5. Add random beneficiaries");
+        System.out.println("6. Move a distribution center");
+        System.out.println("7. Save map to binary file");
+        System.out.println("8. Load map from binary file");
+        System.out.println("9. Import centers from CSV");
+        System.out.println("10. Delete a distribution center");
+        System.out.println("11. Delete a beneficiary");
+        System.out.println("12. Add a specific beneficiary");
 
-        System.out.println("0. Quitter");
-        System.out.print("Votre choix : ");
+        System.out.println("0. Quit");
+        System.out.print("Your choice: ");
     }
 
     /**
@@ -150,11 +151,14 @@ public class CommandLineApp {
             case "11":
                 removeBeneficiaryInteractive();
                 return true;
+            case "12":
+                addBeneficiaryInteractive();
+                return true;
 
             case "0":
                 return false;
             default:
-                System.out.println("Choix inconnu, veuillez réessayer.");
+                System.out.println("Unknown choice, please try again.");
                 return true;
         }
     }
@@ -165,7 +169,7 @@ public class CommandLineApp {
     private void listCenters() {
         List<DistributionCenter> centers = map.getCenters();
         if (centers.isEmpty()) {
-            System.out.println("Il n'y a aucun centre.");
+            System.out.println("There are no centers.");
             return;
         }
         for (DistributionCenter center : centers) {
@@ -179,7 +183,7 @@ public class CommandLineApp {
     private void listBeneficiaries() {
         List<Beneficiary> people = map.getBeneficiaries();
         if (people.isEmpty()) {
-            System.out.println("Il n'y a aucun bénéficiaire.");
+            System.out.println("There are no beneficiaries.");
             return;
         }
         for (Beneficiary b : people) {
@@ -194,10 +198,10 @@ public class CommandLineApp {
     private void showStatistics() {
         for (AidType type : AidType.values()) {
             System.out.println();
-            System.out.println("--- Type d'aide : " + type.getLabel() + " ---");
+            System.out.println("--- Aid Type: " + type.getLabel() + " ---");
             List<VoronoiCell> cells = map.getCells(type);
             if (cells.isEmpty()) {
-                System.out.println("  Aucun centre pour ce type.");
+                System.out.println("  No centers for this type.");
                 continue;
             }
             for (VoronoiCell cell : cells) {
@@ -211,27 +215,38 @@ public class CommandLineApp {
      * Asks the user for the data needed to add a new center.
      */
     private void addCenterInteractive() {
-        System.out.print("Nom de l'association : ");
+        System.out.print("Association name: ");
         String name = scanner.nextLine().trim();
         AidType type = askAidType();
-        double x = askDouble("Position X : ");
-        double y = askDouble("Position Y : ");
+        double x = askCoordinate("Position X: ", 0, 1000);
+        double y = askCoordinate("Position Y: ", 0, 1000);
         Association association = new Association(name, type);
         map.addCenter(new DistributionCenter(new Point(x, y), association));
-        System.out.println("Centre ajouté et carte recalculée.");
+        System.out.println("Center added and map recalculated.");
+    }
+
+    /**
+     * Asks the user for the data needed to add a new beneficiary manually.
+     */
+    private void addBeneficiaryInteractive() {
+        AidType type = askAidType();
+        double x = askCoordinate("Position X: ", 0, 1000);
+        double y = askCoordinate("Position Y: ", 0, 1000);
+        map.addBeneficiary(new Beneficiary(new Point(x, y), type));
+        System.out.println("Beneficiary added and map recalculated.");
     }
 
     /**
      * Asks the user for the data needed to add random beneficiaries.
      */
     private void addRandomBeneficiariesInteractive() {
-        int count = (int) askDouble("Nombre de bénéficiaires à générer : ");
+        int count = (int) askDouble("Number of beneficiaries to generate: ");
         if (count <= 0) {
-            System.out.println("Le nombre doit être positif.");
+            System.out.println("The number must be positive.");
             return;
         }
         new RandomGenerator(1000, 1000).addRandomBeneficiaries(map, count);
-        System.out.println(count + " bénéficiaires ajoutés.");
+        System.out.println(count + " beneficiaries added.");
     }
 
     /**
@@ -239,7 +254,7 @@ public class CommandLineApp {
      */
     private void moveCenterInteractive() {
         listCenters();
-        int id = (int) askDouble("ID du centre à déplacer : ");
+        int id = (int) askDouble("ID of the center to move: ");
         DistributionCenter target = null;
         for (DistributionCenter c : map.getCenters()) {
             if (c.getId() == id) {
@@ -248,26 +263,26 @@ public class CommandLineApp {
             }
         }
         if (target == null) {
-            System.out.println("Aucun centre n'a cet ID.");
+            System.out.println("No center has this ID.");
             return;
         }
-        double x = askDouble("Nouvelle position X : ");
-        double y = askDouble("Nouvelle position Y : ");
+        double x = askCoordinate("New position X: ", 0, 1000);
+        double y = askCoordinate("New position Y: ", 0, 1000);
         map.moveCenter(target, new Point(x, y));
-        System.out.println("Centre déplacé et carte recalculée.");
+        System.out.println("Center moved and map recalculated.");
     }
 
     /**
      * Asks the user for the path to save the map.
      */
     private void saveInteractive() {
-        System.out.print("Chemin du fichier de sauvegarde : ");
+        System.out.print("Backup file path: ");
         String path = scanner.nextLine().trim();
         try {
             new MapIO().save(map, path);
-            System.out.println("Carte sauvegardée.");
+            System.out.println("Map saved.");
         } catch (Exception e) {
-            System.out.println("Impossible de sauvegarder : " + e.getMessage());
+            System.out.println("Unable to save: " + e.getMessage());
         }
     }
 
@@ -275,19 +290,19 @@ public class CommandLineApp {
      * Asks the user for the path to load the map from.
      */
     private void loadInteractive() {
-        System.out.print("Chemin du fichier à charger : ");
+        System.out.print("File path to load: ");
         String path = scanner.nextLine().trim();
         try {
             CharityMap loaded = new MapIO().load(path);
             map.clear();
             loaded.getCenters().forEach(map::addCenter);
             loaded.getBeneficiaries().forEach(map::addBeneficiary);
-            System.out.println("Carte chargée avec "
-                    + map.getCenters().size() + " centres et "
+            System.out.println("Map loaded with "
+                    + map.getCenters().size() + " centers and "
                     + map.getBeneficiaries().size()
-                    + " bénéficiaires.");
+                    + " beneficiaries.");
         } catch (Exception e) {
-            System.out.println("Impossible de charger : " + e.getMessage());
+            System.out.println("Unable to load: " + e.getMessage());
         }
     }
 
@@ -298,15 +313,15 @@ public class CommandLineApp {
      */
     private AidType askAidType() {
         while (true) {
-            System.out.print("Type d'aide (CLOTHING, FOOD, CARE) : ");
+            System.out.print("Aid type (CLOTHING, FOOD, CARE): ");
             if (!scanner.hasNextLine()) {
-                throw new IllegalStateException("Flux d'entrée fermé.");
+                throw new IllegalStateException("Input stream closed.");
             }
             String raw = scanner.nextLine().trim().toUpperCase();
             try {
                 return AidType.valueOf(raw);
             } catch (IllegalArgumentException e) {
-                System.out.println("Type inconnu, veuillez réessayer.");
+                System.out.println("Invalid aid type. Please type CLOTHING, FOOD, or CARE.");
             }
         }
     }
@@ -321,14 +336,32 @@ public class CommandLineApp {
         while (true) {
             System.out.print(prompt);
             if (!scanner.hasNextLine()) {
-                throw new IllegalStateException("Flux d'entrée fermé.");
+                throw new IllegalStateException("Input stream closed.");
             }
-            String raw = scanner.nextLine().trim();
+            String raw = scanner.nextLine().trim().replace(',', '.');
             try {
                 return Double.parseDouble(raw);
             } catch (NumberFormatException e) {
-                System.out.println("Veuillez entrer un nombre valide.");
+                System.out.println("Please enter a valid number.");
             }
+        }
+    }
+
+    /**
+     * Asks the user for a coordinate within a specific range.
+     *
+     * @param prompt the message shown to the user
+     * @param min the minimum allowed value
+     * @param max the maximum allowed value
+     * @return a valid coordinate
+     */
+    private double askCoordinate(String prompt, double min, double max) {
+        while (true) {
+            double val = askDouble(prompt);
+            if (val >= min && val <= max) {
+                return val;
+            }
+            System.out.println("The coordinate must be between " + min + " and " + max + ".");
         }
     }
 
@@ -336,13 +369,13 @@ public class CommandLineApp {
      * Asks the user for the path to the CSV file to import.
      */
     private void importCsvInteractive() {
-        System.out.print("Chemin du fichier CSV : ");
+        System.out.print("CSV file path: ");
         String path = scanner.nextLine().trim();
         try {
             int count = new CsvImporter().importCenters(map, path);
-            System.out.println(count + " centres importés.");
+            System.out.println(count + " centers imported.");
         } catch (Exception e) {
-            System.out.println("Impossible d'importer : " + e.getMessage());
+            System.out.println("Unable to import: " + e.getMessage());
         }
     }
 
@@ -355,7 +388,7 @@ public class CommandLineApp {
         if (centers.isEmpty()) {
             return;
         }
-        int id = (int) askDouble("ID du centre à supprimer : ");
+        int id = (int) askDouble("ID of the center to delete: ");
         DistributionCenter target = null;
         for (DistributionCenter c : centers) {
             if (c.getId() == id) {
@@ -364,11 +397,11 @@ public class CommandLineApp {
             }
         }
         if (target == null) {
-            System.out.println("Aucun centre n'a cet ID.");
+            System.out.println("No center has this ID.");
             return;
         }
         map.removeCenter(target);
-        System.out.println("Centre supprimé et carte recalculée.");
+        System.out.println("Center deleted and map recalculated.");
     }
 
     /**
@@ -380,7 +413,7 @@ public class CommandLineApp {
         if (people.isEmpty()) {
             return;
         }
-        int id = (int) askDouble("ID du bénéficiaire à supprimer : ");
+        int id = (int) askDouble("ID of the beneficiary to delete: ");
         Beneficiary target = null;
         for (Beneficiary b : people) {
             if (b.getId() == id) {
@@ -389,10 +422,10 @@ public class CommandLineApp {
             }
         }
         if (target == null) {
-            System.out.println("Aucun bénéficiaire n'a cet ID.");
+            System.out.println("No beneficiary has this ID.");
             return;
         }
         map.removeBeneficiary(target);
-        System.out.println("Bénéficiaire supprimé.");
+        System.out.println("Beneficiary deleted.");
     }
 }   

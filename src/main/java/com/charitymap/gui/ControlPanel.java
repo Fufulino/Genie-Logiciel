@@ -52,31 +52,31 @@ public class ControlPanel extends VBox {
         setPadding(new Insets(15));
         setStyle("-fx-background-color: #f1f5f9; -fx-border-color: #cbd5e1; -fx-border-width: 0 1px 0 0;");
 
-        Label title = new Label("Contrôles");
+        Label title = new Label("Controls");
         title.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
 
         getChildren().addAll(
                 title,
                 new Separator(),
-                createSectionLabel("Centres de distribution"),
-                createButton("Ajouter un Centre", this::handleAddCenter),
-                createButton("Supprimer sélection", this::handleRemoveCenter),
+                createSectionLabel("Distribution Centers"),
+                createButton("Add a Center", this::handleAddCenter),
+                createButton("Delete Selected", this::handleRemoveCenter),
                 new Separator(),
-                createSectionLabel("Bénéficiaires"),
-                createButton("Ajouter un Bénéficiaire", this::handleAddBeneficiary),
-                createButton("Générer 20 aléatoires (GPS)", this::handleAddRandom),
-                createButton("Supprimer sélection", this::handleRemoveBeneficiary),
+                createSectionLabel("Beneficiaries"),
+                createButton("Add a Beneficiary", this::handleAddBeneficiary),
+                createButton("Generate 20 Random (GPS)", this::handleAddRandom),
+                createButton("Delete Selected", this::handleRemoveBeneficiary),
                 new Separator(),
-                createSectionLabel("Affichage"),
+                createSectionLabel("Display"),
                 createDisplayToggles(),
                 new Separator(),
-                createSectionLabel("Filtre"),
+                createSectionLabel("Filter"),
                 createFilters(),
                 new Separator(),
-                createSectionLabel("Actions Fichiers"),
-                createButton("Importer CSV", this::handleImportCsv),
-                createButton("Sauvegarder", this::handleSaveBinary),
-                createButton("Charger", this::handleLoadBinary)
+                createSectionLabel("File Actions"),
+                createButton("Import CSV", this::handleImportCsv),
+                createButton("Save", this::handleSaveBinary),
+                createButton("Load", this::handleLoadBinary)
         );
     }
 
@@ -95,18 +95,18 @@ public class ControlPanel extends VBox {
 
     private VBox createDisplayToggles() {
         VBox box = new VBox(4);
-        CheckBox chkVoronoi = new CheckBox("Cellules Voronoi");
+        CheckBox chkVoronoi = new CheckBox("Voronoi Cells");
         chkVoronoi.setSelected(true);
         chkVoronoi.setOnAction(e -> mapCanvas.setShowVoronoi(chkVoronoi.isSelected()));
 
-        CheckBox chkDelaunay = new CheckBox("Delaunay (Pointillés)");
+        CheckBox chkDelaunay = new CheckBox("Delaunay (Dashed)");
         chkDelaunay.setOnAction(e -> mapCanvas.setShowDelaunay(chkDelaunay.isSelected()));
 
-        CheckBox chkLinks = new CheckBox("Liaisons bénéficiaires");
+        CheckBox chkLinks = new CheckBox("Beneficiary Links");
         chkLinks.setSelected(true);
         chkLinks.setOnAction(e -> mapCanvas.setShowLinks(chkLinks.isSelected()));
 
-        CheckBox chkCircumcircles = new CheckBox("Cercles circonscrits");
+        CheckBox chkCircumcircles = new CheckBox("Circumscribed Circles");
         chkCircumcircles.setOnAction(e -> mapCanvas.setShowCircumcircles(chkCircumcircles.isSelected()));
 
         box.getChildren().addAll(chkVoronoi, chkDelaunay, chkLinks, chkCircumcircles);
@@ -117,20 +117,20 @@ public class ControlPanel extends VBox {
         VBox box = new VBox(4);
         ToggleGroup group = new ToggleGroup();
 
-        RadioButton rbAll = new RadioButton("Toutes les aides");
+        RadioButton rbAll = new RadioButton("All Aid Types");
         rbAll.setToggleGroup(group);
         rbAll.setSelected(true);
         rbAll.setOnAction(e -> mapCanvas.setFilterType(null));
 
-        RadioButton rbFood = new RadioButton("Alimentation (FOOD)");
+        RadioButton rbFood = new RadioButton("Food (FOOD)");
         rbFood.setToggleGroup(group);
         rbFood.setOnAction(e -> mapCanvas.setFilterType(AidType.FOOD));
 
-        RadioButton rbCare = new RadioButton("Soins (CARE)");
+        RadioButton rbCare = new RadioButton("Care (CARE)");
         rbCare.setToggleGroup(group);
         rbCare.setOnAction(e -> mapCanvas.setFilterType(AidType.CARE));
 
-        RadioButton rbClothing = new RadioButton("Vêtements (CLOTHING)");
+        RadioButton rbClothing = new RadioButton("Clothing (CLOTHING)");
         rbClothing.setToggleGroup(group);
         rbClothing.setOnAction(e -> mapCanvas.setFilterType(AidType.CLOTHING));
 
@@ -148,26 +148,31 @@ public class ControlPanel extends VBox {
     private void handleAddCenter() {
         try {
             TextInputDialog d = new TextInputDialog("Restos du Coeur, FOOD, 49.040, 2.050");
-            d.setTitle("Ajouter un Centre");
-            d.setHeaderText("Format: Nom, Type (FOOD/CARE/CLOTHING), Latitude, Longitude");
+            d.setTitle("Add a Center");
+            d.setHeaderText("Format: Name, Type (FOOD/CARE/CLOTHING), Latitude, Longitude");
             d.showAndWait().ifPresent(val -> {
                 String[] parts = val.split(",");
-                if (parts.length < 4) throw new IllegalArgumentException("Format invalide.");
+                if (parts.length < 4) throw new IllegalArgumentException("Invalid format.");
                 String name = parts[0].trim();
-                AidType type = AidType.valueOf(parts[1].trim().toUpperCase());
+                AidType type;
+                try {
+                    type = AidType.valueOf(parts[1].trim().toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("Invalid aid type '" + parts[1].trim() + "'. Please use CLOTHING, FOOD, or CARE.");
+                }
                 double lat = Double.parseDouble(parts[2].trim().replace(',', '.'));
                 double lon = Double.parseDouble(parts[3].trim().replace(',', '.'));
 
                 if (lat < GeoProjection.LAT_MIN || lat > GeoProjection.LAT_MAX ||
                     lon < GeoProjection.LON_MIN || lon > GeoProjection.LON_MAX) {
-                    throw new IllegalArgumentException("Hors limites de Cergy.");
+                    throw new IllegalArgumentException("Out of Cergy bounds.");
                 }
                 Point p = GeoProjection.toPixel(lat, lon);
                 charityMap.addCenter(new DistributionCenter(p, new Association(name, type)));
                 updateAfterChange();
             });
         } catch (Exception e) {
-            showError("Erreur", e.getMessage());
+            showError("Error", e.getMessage());
         }
     }
 
@@ -178,32 +183,37 @@ public class ControlPanel extends VBox {
             mapCanvas.setSelectedCenter(null);
             updateAfterChange();
         } else {
-            showError("Erreur", "Veuillez sélectionner un centre sur la carte.");
+            showError("Error", "Please select a center on the map.");
         }
     }
 
     private void handleAddBeneficiary() {
         try {
             TextInputDialog d = new TextInputDialog("FOOD, 49.040, 2.050");
-            d.setTitle("Ajouter un Bénéficiaire");
-            d.setHeaderText("Format: Besoin (FOOD/CARE/CLOTHING), Latitude, Longitude");
+            d.setTitle("Add a Beneficiary");
+            d.setHeaderText("Format: Need (FOOD/CARE/CLOTHING), Latitude, Longitude");
             d.showAndWait().ifPresent(val -> {
                 String[] parts = val.split(",");
-                if (parts.length < 3) throw new IllegalArgumentException("Format invalide.");
-                AidType need = AidType.valueOf(parts[0].trim().toUpperCase());
+                if (parts.length < 3) throw new IllegalArgumentException("Invalid format.");
+                AidType need;
+                try {
+                    need = AidType.valueOf(parts[0].trim().toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("Invalid aid type '" + parts[0].trim() + "'. Please use CLOTHING, FOOD, or CARE.");
+                }
                 double lat = Double.parseDouble(parts[1].trim().replace(',', '.'));
                 double lon = Double.parseDouble(parts[2].trim().replace(',', '.'));
 
                 if (lat < GeoProjection.LAT_MIN || lat > GeoProjection.LAT_MAX ||
                     lon < GeoProjection.LON_MIN || lon > GeoProjection.LON_MAX) {
-                    throw new IllegalArgumentException("Hors limites de Cergy.");
+                    throw new IllegalArgumentException("Out of Cergy bounds.");
                 }
                 Point p = GeoProjection.toPixel(lat, lon);
                 charityMap.addBeneficiary(new Beneficiary(p, need));
                 updateAfterChange();
             });
         } catch (Exception e) {
-            showError("Erreur", e.getMessage());
+            showError("Error", e.getMessage());
         }
     }
 
@@ -225,7 +235,7 @@ public class ControlPanel extends VBox {
             mapCanvas.setSelectedBeneficiary(null);
             updateAfterChange();
         } else {
-            showError("Erreur", "Veuillez sélectionner un bénéficiaire.");
+            showError("Error", "Please select a beneficiary.");
         }
     }
 
@@ -237,9 +247,9 @@ public class ControlPanel extends VBox {
             try {
                 int count = new CsvImporter().importCenters(charityMap, file.getAbsolutePath(), GeoProjection::toPixel);
                 updateAfterChange();
-                showInfo("Succès", count + " centres importés.");
+                showInfo("Success", count + " centers imported.");
             } catch (Exception e) {
-                showError("Erreur", e.getMessage());
+                showError("Error", e.getMessage());
             }
         }
     }
@@ -251,9 +261,9 @@ public class ControlPanel extends VBox {
         if (file != null) {
             try {
                 new MapIO().save(charityMap, file.getAbsolutePath());
-                showInfo("Succès", "Carte sauvegardée.");
+                showInfo("Success", "Map saved.");
             } catch (Exception e) {
-                showError("Erreur", e.getMessage());
+                showError("Error", e.getMessage());
             }
         }
     }
@@ -269,9 +279,9 @@ public class ControlPanel extends VBox {
                 loaded.getCenters().forEach(charityMap::addCenter);
                 loaded.getBeneficiaries().forEach(charityMap::addBeneficiary);
                 updateAfterChange();
-                showInfo("Succès", "Carte chargée.");
+                showInfo("Success", "Map loaded.");
             } catch (Exception e) {
-                showError("Erreur", e.getMessage());
+                showError("Error", e.getMessage());
             }
         }
     }

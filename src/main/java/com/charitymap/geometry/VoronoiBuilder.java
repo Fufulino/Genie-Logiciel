@@ -21,6 +21,11 @@ import java.util.List;
 public class VoronoiBuilder {
 
     /**
+     * Default constructor for VoronoiBuilder.
+     */
+    public VoronoiBuilder() {}
+
+    /**
      * Builds the list of coverage zones for a set of centers, given the
      * Delaunay triangulation of their positions.
      *

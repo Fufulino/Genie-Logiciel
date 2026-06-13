@@ -16,6 +16,10 @@ import com.charitymap.model.CharityMap;
  */
 public class MapIO {
     /**
+     * Default constructor for MapIO.
+     */
+    public MapIO() {}
+    /**
      * Saves a map to a binary file.
      *
      * @param map  the map to save
