@@ -52,6 +52,13 @@ javac -d out $(find src/main/java -name "*.java")
 java -cp out com.charitymap.cli.CommandLineApp
 ```
 
+### Génération de la Documentation (Javadoc)
+Pour générer la documentation technique complète du code :
+```bash
+mvn javadoc:javadoc
+```
+Les fichiers HTML seront générés dans le dossier `target/site/apidocs/`. Vous pourrez alors ouvrir le fichier `index.html` dans votre navigateur.
+
 ## Architecture du Code
 
 Le projet est construit sur une architecture en couches (Clean Architecture) garantissant que le moteur mathématique est totalement indépendant de la technologie d'affichage :
