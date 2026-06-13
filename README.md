@@ -49,17 +49,17 @@ Vous pouvez tout à fait utiliser le projet sans aucune ligne de commande :
 
 ### Méthode 3 : Sans Maven du tout (Version CLI Uniquement)
 
-Si vous n'avez ni Maven ni un IDE, vous pouvez compiler et lancer la version Console (qui n'a pas besoin de JavaFX) avec le compilateur Java standard :
+Si vous n'avez ni Maven ni un IDE, vous pouvez compiler et lancer la version Console (qui n'a pas besoin de JavaFX) avec le compilateur Java standard en excluant le dossier `gui` (qui nécessite JavaFX) :
 
 - **Sur Linux / macOS (Bash) :**
   ```bash
-  # Compiler les fichiers Java dans un dossier "out"
-  javac -d out $(find src/main/java -name "*.java")
+  # Compiler les fichiers Java (hors GUI) dans un dossier "out"
+  javac -d out $(find src/main/java -name "*.java" -not -path "*/gui/*")
   ```
 - **Sur Windows (PowerShell) :**
   ```powershell
-  # Compiler les fichiers Java dans un dossier "out"
-  javac -d out (Get-ChildItem -Recurse src/main/java/*.java | Resolve-Path)
+  # Compiler les fichiers Java (hors GUI) dans un dossier "out"
+  javac -d out (Get-ChildItem -Recurse src/main/java/*.java | Where-Object { $_.FullName -notmatch '\\gui\\' }).FullName
   ```
 - **Lancement :**
   ```bash
